@@ -1,0 +1,3 @@
+1.0.1
+--------------
+- Fixed a bug where the application wouldn't update the registry values the first time it was launched.

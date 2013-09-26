@@ -45,12 +45,19 @@ public class FileSwitcher {
 		
 		// This should only happen the first time the user runs the application
 		if(getLastVersion() == null) {
-			
 			// Set version to the current version the user has
 			setLastVersion(version);
 			
 			// And back up these files since the user probably didn't back them up already
 			backupFiles();
+			
+			// Update the "Save Path" and "Resolution" registry variables
+			RegistryUtility ru = new RegistryUtility(root.getAbsolutePath(), version, expansion);
+						
+			ru.update();
+			
+			// Make sure that the save directory exists in this sub-directory
+			checkSaveDir();
 			
 			// Launch the game
 			runGame();
