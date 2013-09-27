@@ -1,0 +1,9 @@
+This project uses some function calls from the "Apache Commons Exec" product.
+
+You can find it's license at http://www.apache.org/licenses/LICENSE-2.0
+
+Apache Commons Exec
+Copyright 2005-2010 The Apache Software Foundation
+
+This product includes software developed by
+The Apache Software Foundation (http://www.apache.org/).

@@ -18,80 +18,90 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecuteResultHandler;
+import org.apache.commons.exec.DefaultExecutor;
 import static java.nio.file.StandardCopyOption.*;
 
 // Switches the files to the correct version of Diablo II 
 
 public class FileSwitcher {
-	public FileSwitcher(Entry entry) {
+	public FileSwitcher() {
+		lastRanVersion = null;
+		lastRanVersionFile = "LastRanVersion.txt";
+		processCount = 0;
+	}
+	
+	// Sets the information about the entry you want to launch
+	public void setEntry(Entry entry) {
 		version = entry.getVersion();
 		path = entry.getPath();
 		flags = entry.getSplitFlags();
 		expansion = entry.isExpansion();
-		lastRanVersion = null;
+		
 		game = new File(path);
 		root = new File(game.getParent());
-		lastRanVersionFile = "LastRanVersion.txt";
 	}
 	
+	// Launches the game for the appropriate scenario
+	// 1. First time running the application
+	// 2. Replaying the version you played before
+	// 3. Playing a different version than the last one you played
 	public void launch() {
-		System.out.println("Executing Diablo II: " + version);
+		System.out.println("Launching Diablo II: " + getGameType() + " " + version);
 		
-		// Get last version ran and check with current version
-		// if match, run game, if not, set lastRanVersion and copy files to directory, and set savepath
-		
-		// This should only happen the first time the user runs the application
+		// This will only happen the first time the user runs the application
 		if(getLastVersion() == null) {
 			// Set version to the current version the user has
-			setLastVersion(version);
-			
-			// And back up these files since the user probably didn't back them up already
+			setLastVersion(version, expansion);
+					
+			// Backs up the files since this is the first time you are running this application
 			backupFiles();
 			
-			// Update the "Save Path" and "Resolution" registry variables
-			RegistryUtility ru = new RegistryUtility(root.getAbsolutePath(), version, expansion);
-						
-			ru.update();
-			
-			// Make sure that the save directory exists in this sub-directory
-			checkSaveDir();
+			// Updates the registry and makes sure that you have a save directory set up (Fresh environment)
+			prepareRegistry();
 			
 			// Launch the game
 			runGame();
-		} else if(getLastVersion().equalsIgnoreCase(version.toString())) {
-			// Since this was the last version you were playing, most of the files are already in place.
+		} 
+		else if(getLastVersion().equalsIgnoreCase(version.toString()) && lastRanType == expansion) {
+			// Since this was the last version you were playing, just start the game.
 			runGame();
 		}
 		else {
-			// If you are running a different version of D2 compared to the last one, this 'else' will run.
+			// This will run if you want to run a different version of D2 compared to the last one
 			
-			// Backup the files first
-			backupFiles();
-			
-			// Copy the files for the target version now
-			copyFiles();
-			
-			// Update the "Save Path" and "Resolution" registry variables
-			RegistryUtility ru = new RegistryUtility(root.getAbsolutePath(), version, expansion);
-			
-			ru.update();
-			
-			// Make sure that the save directory exists in this sub-directory
-			checkSaveDir();
-			
-			// write the version for this run now
-			setLastVersion(version);
-			
-			// Launch the game
-			runGame();
+			// Launch the game only if another D2 version isn't running
+			if(getProcessCount() == 0) {
+				// Backs up the files if you don't already have a backup for this new version
+				backupFiles();
+				
+				// Copy the files for the target version now
+				restoreFiles();
+				
+				// Updates the registry and makes sure that you have a save directory set up (Fresh environment)
+				prepareRegistry();
+				
+				// write the version for this run now
+				setLastVersion(version, expansion);
+				
+				// Start the game
+				runGame();
+			}
+			else {
+				System.out.println("You are already running a different version of Diablo II. Close it before switching to another version.");
+			}
 		}	
 	}
 	
-	// Checks to see if a save directory exists, if not, creates it
-	private void checkSaveDir() {
+	// Update the "Save Path" and "Resolution" registry variables
+	public void prepareRegistry() {
+		RegistryUtility ru = new RegistryUtility(root.getAbsolutePath(), version, expansion);
+		ru.update();
+	}
+	
+	// Makes sure that the backup/save directories exist
+	private void prepareBackupDir() {
 		File saveDir = null;
 		
 		// Sets the path depending if it's an expansion or classic entry
@@ -102,61 +112,24 @@ public class FileSwitcher {
 			saveDir = new File(root.getAbsolutePath() + "\\Classic\\" + version + "\\save\\");
 		}
 		
+		// If we are going to be creating the backup directory, might as well use the 'save' directory as the top most
+		// folder since we are going to need to create this directory anyways
 		if(!saveDir.exists()) {
-			System.out.println("Save directory doesn't exist for version " + version + ". Creating now...");
 			saveDir.mkdirs();
 		}
 	}
 	
+	// Runs the game in a separate thread
 	private void runGame() {
-		try {
-			List<String> params = new ArrayList<String>();
-			
-			// Adding the game to the list
-			params.add(path.toString());
-			
-			// Adding the rest of the flags to the list
-			for(String x: flags) {
-				params.add(x);
-			}
-			
-			@SuppressWarnings("unused")
-			Process p = new ProcessBuilder(params).start();
-		}
-		catch(IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	// Copies the files for the version you want to play
-	private void copyFiles() {
-		for(String x: requiredFiles) {
-			File source = null;
-			File dest = new File(root.getAbsolutePath() + "\\" + x);
-			
-			// Sets the path depending if it's an expansion or classic entry
-			if(expansion == true) {
-				source = new File(root.getAbsolutePath() + "\\Expansion\\" + version + "\\" + x);
-			} else {
-				source = new File(root.getAbsolutePath() + "\\Classic\\" + version + "\\" + x);
-			}
-
-			Path sourceDll = Paths.get(source.getAbsolutePath());
-			Path destDll = Paths.get(dest.getAbsolutePath());
-				
-			if(source.exists()) {
-				try {
-					System.out.println("[" + version + "] Copying " + source.getName() + " to " + dest.getParent());
-					Files.copy(sourceDll, destDll, REPLACE_EXISTING);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}		
-			}
-		}
+			Thread gameLaunch = new Thread(new LauncherRunnable());
+			gameLaunch.start();
 	}
 	
 	// Backup the files that are in this current directory
 	private void backupFiles() {
+		// Makes sure that the backup directories exist
+		prepareBackupDir();
+		
 		for(String x: requiredFiles) {
 			File source = new File(root.getAbsolutePath() + "\\" + x);	
 			File dest = null;
@@ -168,33 +141,11 @@ public class FileSwitcher {
 			else {
 				dest = new File(root.getAbsolutePath() + "\\Classic\\" + version + "\\" + x);
 			}
-			
-			if(source.exists()) {
-				if(dest.exists()) {
-					System.out.println("File: " + dest.getName() + " already backed up in the " + dest.getParent() + " directory.");	
-				} 
-				else {
-					File backupDir = new File(dest.getParent());
-					
-					// If the backup directory doesn't exist, Then make it
-					if(!backupDir.exists()) {
-						backupDir.mkdirs();
-					}
-					
-					// Backup the files
-					backupFilesHandler(source, dest);
-				}
-			}
-		}
 		
-		// Switch the Expansion MPQs to different locations depending if expansion/classic
-		if(expansion == true) {
-			System.out.println("Switching to Expansion...");
-			switchToExpansion();
-		}
-		else {
-			System.out.println("Switching to Classic...");
-			switchToClassic();
+			// Backup the files if they aren't already backed up
+			if(source.exists() && !dest.exists()) {
+				backupFilesHandler(source, dest);
+			}
 		}
 	}
 	
@@ -203,21 +154,17 @@ public class FileSwitcher {
 		Path destDll = Paths.get(dest.getAbsolutePath());
 		
 		// Check to see if the version is 1.00/1.07 and if it is then don't copy some files
-		try {	
+		try {
 			// Expansion
 			if(expansion == true) {
 				if(version.equalsIgnoreCase("1.07") && !source.getName().equalsIgnoreCase("Patch_D2.mpq")) {
-						System.out.println("Backing up: " + source.getName() + " to " + version + " directory.");
-						Files.copy(sourceDll, destDll, REPLACE_EXISTING);	
+					Files.copy(sourceDll, destDll, REPLACE_EXISTING);	
 				} 
-				else if(version.equalsIgnoreCase("1.07") && source.getName().equalsIgnoreCase("Patch_D2.mpq")){ 
-						System.out.println("This is expansion 1.07 and a patch has been detected.");
-						System.out.println("Deleting: " + source.getName());
-						source.delete();
+				else if(version.equalsIgnoreCase("1.07") && source.getName().equalsIgnoreCase("Patch_D2.mpq")){
+					source.delete();
 				}
 				else {
 					// You can copy the same files for all the other versions (Well... anything > 1.07).
-					System.out.println("Backing up " + source.getName() + " to " + version + " directory.");
 					Files.copy(sourceDll, destDll, REPLACE_EXISTING);
 				}
 			}
@@ -225,16 +172,14 @@ public class FileSwitcher {
 				// Classic
 				if(version.equalsIgnoreCase("1.00") && (!source.getName().equalsIgnoreCase("Patch_D2.mpq") 
 													&& !source.getName().equalsIgnoreCase("BNUpdate.exe"))) {
-					System.out.println("Backing up: " + source.getName() + " to " + version + " directory.");
 					Files.copy(sourceDll, destDll, REPLACE_EXISTING);
 				} 
 				else if(version.equalsIgnoreCase("1.00") && (source.getName().equalsIgnoreCase("Patch_D2.mpq") 
 														 || source.getName().equalsIgnoreCase("BNUpdate.exe"))){
-						source.delete();
+					source.delete();
 				}
 				else {
 					// You can copy the same files for all the other versions (Well... anything > 1.00).
-					System.out.println("Backing up " + source.getName() + " to " + version + " directory.");
 					Files.copy(sourceDll, destDll, REPLACE_EXISTING);
 				}
 			}	
@@ -242,6 +187,40 @@ public class FileSwitcher {
 			e.printStackTrace();
 		}
 	}
+	
+	// Restore the files for the version you want to play
+		private void restoreFiles() {
+			for(String x: requiredFiles) {
+				File source = null;
+				File dest = new File(root.getAbsolutePath() + "\\" + x);
+				
+				// Sets the path depending if it's an expansion or classic entry
+				if(expansion == true) {
+					source = new File(root.getAbsolutePath() + "\\Expansion\\" + version + "\\" + x);
+				} else {
+					source = new File(root.getAbsolutePath() + "\\Classic\\" + version + "\\" + x);
+				}
+
+				Path sourceDll = Paths.get(source.getAbsolutePath());
+				Path destDll = Paths.get(dest.getAbsolutePath());
+					
+				if(source.exists()) {
+					try {
+						Files.copy(sourceDll, destDll, REPLACE_EXISTING);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			
+			// Switch the Expansion MPQs to different locations depending if expansion/classic
+			if(expansion == true) {
+				switchToExpansion();
+			}
+			else {
+				switchToClassic();
+			}
+		}
 	
 	// Moves the expansion specific MPQs to the Expansion directory
 	private void switchToClassic() {
@@ -253,8 +232,6 @@ public class FileSwitcher {
 			Path destMPQ = Paths.get(dest_mpq.getAbsolutePath());
 			
 			if(source_mpq.exists()) {
-				System.out.println("Expansion File: " + source_mpq.getName() + " exists. Moving to Expansion directory.");
-				
 				try {
 					Files.move(sourceMPQ, destMPQ, REPLACE_EXISTING);
 				} catch (IOException e) {
@@ -274,8 +251,6 @@ public class FileSwitcher {
 			Path destMPQ = Paths.get(dest_mpq.getAbsolutePath());
 			
 			if(source_mpq.exists()) {
-				System.out.println("Expansion File: " + source_mpq.getName() + " exists. Moving to root directory.");
-				
 				try {
 					Files.move(sourceMPQ, destMPQ, REPLACE_EXISTING);
 				} catch (IOException e) {
@@ -284,12 +259,11 @@ public class FileSwitcher {
 			}
 		}
 	}
-	private void setLastVersion(String version) {
-		System.out.println("Saving data into " + lastRanVersionFile + "...");
-    	
+	
+	private void setLastVersion(String version, boolean expansion) {
     	try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(lastRanVersionFile));
-			bw.write(version + "\r\n");
+			bw.write(version + ";" + expansion + "\r\n");
 			bw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -306,7 +280,9 @@ public class FileSwitcher {
 				BufferedReader br = new BufferedReader(new FileReader(lastRanVersionFile));
 				
 				while((line = br.readLine()) != null) {
-					lastRanVersion = line;
+					String[] result = line.split(";");
+					lastRanVersion = result[0];
+					lastRanType = Boolean.parseBoolean(result[1]);
 				}
 				
 				br.close();
@@ -321,12 +297,65 @@ public class FileSwitcher {
 		return lastRanVersion;
 	}
 	
+	private String getGameType() {
+		if(expansion == true) { return "Expansion"; }
+		else { return "Classic"; }
+	}
+	
+	public class LauncherRunnable implements Runnable {
+		public void run() {
+			CommandLine cmdLine = new CommandLine(path);
+			DefaultExecutor launcher = new DefaultExecutor();
+			DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
+			
+			// Exit Codes: Game.exe = 0; Diablo II.exe = 1
+			if(path.contains("Diablo II.exe")) {
+				launcher.setExitValue(1);
+			}
+			
+			// Prepare the command line string so that we can execute everything in one shot
+			for(String x: flags) {
+				cmdLine.addArgument(x);
+			}
+			
+			// Launch the process and add one to the counter
+			try {
+				launcher.execute(cmdLine, resultHandler);
+				addProcessCount();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+				
+			// Wait for the process to finish. Once the process finishes, remove one from the counter
+			try {
+				resultHandler.waitFor();
+				delProcessCount();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}	
+	}
+	
+	public int getProcessCount() {
+		return processCount;
+	}
+	
+	public void addProcessCount() {
+		processCount += 1;
+	}
+	
+	public void delProcessCount() {
+		processCount -= 1;
+	}
+	
 	private String version;
 	private String path;
 	private String[] flags;
 	private boolean expansion;
 	private String lastRanVersion;
 	private String lastRanVersionFile;
+	private boolean lastRanType;
+	private int processCount;
 	
 	private File game;
 	private File root;

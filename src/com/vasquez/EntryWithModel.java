@@ -87,8 +87,6 @@ public class EntryWithModel {
     }
     
     public int saveData() {
-    	System.out.println("Saving data into " + entriesFile + "...");
-    	
     	try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(entriesFile));
 			
@@ -105,8 +103,6 @@ public class EntryWithModel {
     }
     
     public int loadData() {
-    	System.out.println("Loading data from " + entriesFile + "...");
-    	
     	// Make sure we start off with a fresh list
     	list.clear();
     	
@@ -125,9 +121,8 @@ public class EntryWithModel {
 			
 			while((line = br.readLine()) != null) {
 				String[] result = line.split(";");
-				
+		
 				list.add(new Entry(result[0], result[2], result[3], Boolean.parseBoolean(result[1])));
-				System.out.println("Added: " + result[0]);
 			}
 			
 			br.close();

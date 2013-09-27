@@ -22,17 +22,16 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.UIManager;
 import javax.swing.table.TableColumn;
 
 public class BVS {
 	public static void main(String[] args) {
 	  javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-            	BVS gui = new BVS();
+            	BVS gui = new BVS();    	
         		gui.start();
             }
-        });	
+        });  
 	}
 	
 	public void start() {
@@ -42,13 +41,8 @@ public class BVS {
 		mainFrame.setSize(500,300);
 		mainFrame.setLocationRelativeTo(null); // Center the application
 		
-		// Set UI to look native
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+		// Create File Switcher
+		fs = new FileSwitcher();
 		
 		// Buttons on South
 		JButton add = new JButton("Add");
@@ -133,13 +127,10 @@ public class BVS {
 	
 	private class LaunchListener implements ActionListener {
 		public void actionPerformed(ActionEvent ev) {
-			System.out.println("Launching Diablo II...");
-				
 			if(entryTable.getSelectedRow() != -1 || entryTable.getSelectedColumn() != -1) {
 				Entry ent = tableManager.getEntry(entryTable.getSelectedRow());
 				
-				FileSwitcher fs = new FileSwitcher(ent);
-				
+				fs.setEntry(ent);
 				fs.launch();
 			}
 		}
@@ -182,9 +173,12 @@ public class BVS {
 	private JTable entryTable;
 	private EntryWithModel tableManager;
 	
+	// File Switcher
+	private FileSwitcher fs;
+	
 	// Program Information
 	private String name = "Bliss Version Switcher";
-	private String version = "1.0.1";
+	private String version = "1.0.2";
 	private String author = "Jonathan Vasquez";
 	private String contact = "JVasquez1011@Gmail.com";
 	private String license = "MPL 2.0";

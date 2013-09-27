@@ -1,3 +1,20 @@
+1.0.2
+--------------
+- Cleaned up some parts of the code
+- Improved the file switching algorithms
+- Removed a lot of debugging messages
+- Switched UI from the native Windows look to the normal Java look
+
+- Fixed a bug where the program wouldn't switch to the correct (expansion|classic) if the last
+  version you ran was equal to the version you want to run for the other.
+  
+  * Example: If the last version you played was 1.13d expansion but then wanted to play 1.13d classic, it would open 1.13d expansion again.
+  
+- Fixed a bug where if you had one Diablo II version open, and you opened another version of D2, the registry values/save path would update
+  but then the current running Diablo II game would be out of sync with the system values. Thus, now the program makes sure that you can only run
+  multiple copies of identical version/type of the game. Meaning if you opened classic 1.06b, you can run another classic 1.06b, but you can't run
+  classic 1.06b and then click on classic 1.09 (or expansion 1.09 or any other version that isn't classic 1.06b.. ok I think you get the point).
+
 1.0.1
 --------------
 - Fixed a bug where the application wouldn't update the registry values the first time it was launched.

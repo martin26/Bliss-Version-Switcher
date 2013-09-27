@@ -30,7 +30,6 @@ public class RegistryUtility {
 	// This will prepare a registry file with the correct save path. We will use this file and feed it to the 'reg' application
 	// which in turn will update the registry. This avoids using the external 'jni' library and other types of more complicated hacks.
 	private void prepareRegistryFile() {
-		System.out.println("Preparing Registry File...");
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(registryFile));
 			bw.write("Windows Registry Editor Version 5.00\r\n");
@@ -58,7 +57,6 @@ public class RegistryUtility {
 	}
 	
 	private void updateRegistry() {
-		System.out.println("Updating \"Save Path\"...");
 		try {
 			List<String> params = java.util.Arrays.asList("REG.EXE", "IMPORT", registryFile);
 			Process p = new ProcessBuilder(params).start();

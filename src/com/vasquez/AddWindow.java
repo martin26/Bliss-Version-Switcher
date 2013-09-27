@@ -13,6 +13,7 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -48,7 +49,7 @@ public class AddWindow extends JFrame {
 		path = new JTextField();
 		flags = new JTextField();
 		expansion = new JCheckBox("Expansion");
-		
+
 		// Create the layout and add the components to their respective places
 		JPanel centerPanel = new JPanel(new GridLayout(3,2));
 		JPanel southPanel = new JPanel(new GridLayout(1,2));
@@ -97,4 +98,13 @@ public class AddWindow extends JFrame {
 	private JTextField path;
 	private JTextField flags;
 	private JCheckBox expansion;
+	
+	// Might use this in the future for a combobox, but maybe it's better to just
+	// type it in so that it gives the user more flexibility.
+	private String[] availableVersions = {
+			"1.00", "1.01", "1.02", "1.03", "1.04", "1.04b", "1.04c",
+			"1.05", "1.05b", "1.06", "1.06b", "1.07", 
+			"1.08", "1.09", "1.09b", "1.09c", "1.09d", "1.10", "1.11",
+			"1.11b", "1.12", "1.13c", "1.13d"
+	};
 }
