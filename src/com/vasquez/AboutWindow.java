@@ -21,7 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class AboutWindow extends JFrame {
-	public AboutWindow(String name, String version, String author, String contact, String license, JButton about) {
+	public AboutWindow(String name, String version, String releaseDate, String author, String contact, String license, JButton about) {
 		super("About");
 		
 		// Set window properties
@@ -30,6 +30,7 @@ public class AboutWindow extends JFrame {
 		// Bring in the table manager and entry table resources
 		this.name = name;
 		this.version = version;
+		this.releaseDate = releaseDate;
 		this.author = author;
 		this.contact = contact;
 		this.license = license;
@@ -42,18 +43,20 @@ public class AboutWindow extends JFrame {
 		
 		JLabel nameL = new JLabel("Name:");
 		JLabel versionL = new JLabel("Version:");
+		JLabel releaseDateL = new JLabel("Released:");
 		JLabel authorL = new JLabel("Author:");
 		JLabel contactL = new JLabel("Contact:");
 		JLabel licenseL = new JLabel("License:");
 		
 		JTextField nameTF = new JTextField(name);
 		JTextField versionTF = new JTextField(version);
+		JTextField releaseDateTF = new JTextField(releaseDate);
 		JTextField authorTF = new JTextField(author);
 		JTextField contactTF = new JTextField(contact);
 		JTextField licenseTF = new JTextField(license);
 		
 		// Create the layout and add the components to their respective places
-		JPanel centerPanel = new JPanel(new GridLayout(5,2));
+		JPanel centerPanel = new JPanel(new GridLayout(6,2));
 		JPanel southPanel = new JPanel(new GridLayout(1,2));
 		
 		southPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
@@ -68,6 +71,8 @@ public class AboutWindow extends JFrame {
 		centerPanel.add(nameTF);
 		centerPanel.add(versionL);
 		centerPanel.add(versionTF);
+		centerPanel.add(releaseDateL);
+		centerPanel.add(releaseDateTF);
 		centerPanel.add(authorL);
 		centerPanel.add(authorTF);
 		centerPanel.add(contactL);
@@ -85,6 +90,7 @@ public class AboutWindow extends JFrame {
 	
 	private String name;
 	private String version;
+	private String releaseDate;
 	private String author;
 	private String contact;
 	private String license;

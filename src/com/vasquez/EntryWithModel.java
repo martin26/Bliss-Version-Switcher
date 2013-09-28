@@ -27,20 +27,32 @@ public class EntryWithModel {
 		peModel = new EntryModel();
 	}
     
-    public void addEntry(String version, String path, String flags, boolean expansion) {
-    	peModel.addEntry(version, path, flags, expansion);
+    public int addEntry(String version, String path, String flags, boolean expansion) {
+    	return peModel.addEntry(version, path, flags, expansion);
     }
     
     public void modifyEntry(String version, String path, String flags, boolean expansion, int e) {
     	peModel.modifyEntry(version, path, flags, expansion, e);
     }
     
-    public Entry delEntry(int e) {
+    public int delEntry(int e) {
     	return peModel.delEntry(e);
     }
     
     public Entry getEntry(int i) {
     	return list.get(i);
+    }
+    
+    public int copyEntry(int e) {
+    	return peModel.copyEntry(e);
+    }
+    
+    public int shiftUp(int e) {
+    	return peModel.shiftUp(e);
+    }
+    
+    public int shiftDown(int e) {
+    	return peModel.shiftDown(e);
     }
     
     public Object getValueAt(int row, int col) {
@@ -175,7 +187,7 @@ public class EntryWithModel {
     	// Get the class type of the column so that we can get the check boxes to render correctly
 		public Class getColumnClass(int c) {
               return getValueAt(0, c).getClass();
-          }
+        }
     	
     	public String getSelectedVersion(int row) {
     		return list.get(row).getVersion();	
@@ -193,10 +205,13 @@ public class EntryWithModel {
     		return list.get(row).isExpansion();
     	}
     	
-    	public void addEntry(String version, String path, String flags, boolean expansion) {
+    	public int addEntry(String version, String path, String flags, boolean expansion) {
     	     list.add(new Entry(version, path, flags, expansion));
+    	      
     	     saveData();
     	     fireTableDataChanged();
+    	     
+    	     return list.size()-1;
     	}
     	
     	public void modifyEntry(String version, String path, String flags, boolean expansion, int e) {
@@ -211,22 +226,64 @@ public class EntryWithModel {
    	     	fireTableDataChanged();
     	}
     	
-	   public Entry delEntry(int e) {
-	    	int entry = e;
-	    	
+	    public int delEntry(int entry) {	
 	    	if(entry != -1) {
-	    		Entry r = list.remove(entry);
+	    		list.remove(entry);
 	    		saveData();
 	    		fireTableDataChanged();
 	    		
-	    		return r;		
+	    		return entry - 1;		
 	    	}
 	    	
 	    	// Returns null if some error happened
-	    	return null;
-	    }	
+	    	return -1;
+	    }
+	   
+	    // Copies the entry that is passed to this method and then inserts it into the list
+		public int copyEntry(int entry) {
+	    	int next = entry + 1;
+	   
+	    	if(entry != -1) {
+	    		Entry oldEntry = list.get(entry);
+	    		Entry newEntry = new Entry(oldEntry.getVersion(), oldEntry.getPath(), oldEntry.getFlags(), oldEntry.isExpansion());
+	    		
+	    		list.add(next, newEntry);
+	    		
+	    		saveData();
+	    		fireTableDataChanged();
+	    		
+	    		return next;
+	    	} else { return -1; }
+	    }
+		
+		public int shiftUp(int entry) {
+			int previous = entry - 1;
+			
+			if(previous >= 0) {
+				swap(entry, previous);
+				return previous;
+			} else { return -1; }
+		}
+		
+		public int shiftDown(int entry) {
+			int next = entry + 1;
+			
+			if(next < list.size()) {
+				swap(entry, next);
+				return next;
+			} else { return -1; }
+		}
+		
+		// Swaps two values
+		private void swap(int source, int target) {
+			Entry temp = list.get(target);
+			list.set(target, list.get(source));
+			list.set(source, temp);
+			saveData();
+    		fireTableDataChanged();
+		}
     }
-    
+	
     private String entriesFile;
     private ArrayList<Entry> list;
 	private String[] columnNames = {"Version", "Exp", "Path", "Flags"};

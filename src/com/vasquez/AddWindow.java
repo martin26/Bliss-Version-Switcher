@@ -85,13 +85,16 @@ public class AddWindow extends JFrame {
 		public void actionPerformed(ActionEvent ev) {
 			// If none of the fields are empty, than add the field. None of the fields can be empty or the program will crash
 			// because it won't be able to parse the values correctly.
+			int result = 0;
+			
 			if(!path.getText().isEmpty() && !flags.getText().isEmpty()) {
-				tableManager.addEntry(version.getSelectedItem().toString(), path.getText(), flags.getText(), expansion.isSelected());	
+				result = tableManager.addEntry(version.getSelectedItem().toString(), path.getText(), flags.getText(), expansion.isSelected());	
 			}
 			
 			entryTable.repaint();
 			dispose();
 			mainAddButton.setEnabled(true);
+			entryTable.setRowSelectionInterval(result, result);
 		}
 	}
 	

@@ -119,14 +119,23 @@ public class ModifyWindow extends JFrame {
 	private class ExpansionListener implements ItemListener {
 		public void itemStateChanged(ItemEvent arg0) {
 			DefaultComboBoxModel d = null;
-			if(expansion.isSelected()) {
+	
+			if(tableManager.isSelectedExpansion(selectedEntry) && expansion.isSelected()) {
 				d = new DefaultComboBoxModel(Listing.expansionVersions);
 				version.setModel(d);
-				version.setSelectedIndex(0);
-			} else {
+				version.setSelectedIndex(versionIndex);
+			} else if (tableManager.isSelectedExpansion(selectedEntry) && !expansion.isSelected()){
 				d = new DefaultComboBoxModel(Listing.classicVersions);
 				version.setModel(d);
 				version.setSelectedIndex(0);
+			} else if (!tableManager.isSelectedExpansion(selectedEntry) && expansion.isSelected()){
+				d = new DefaultComboBoxModel(Listing.expansionVersions);
+				version.setModel(d);
+				version.setSelectedIndex(0);
+			} else if (!tableManager.isSelectedExpansion(selectedEntry) && !expansion.isSelected()){
+				d = new DefaultComboBoxModel(Listing.classicVersions);
+				version.setModel(d);
+				version.setSelectedIndex(versionIndex);
 			}
 		}
 	}

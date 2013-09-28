@@ -51,6 +51,9 @@ public class BVS {
 		modify = new JButton("Modify");
 		JButton launch = new JButton("Launch");
 		about = new JButton("About");
+		JButton copy = new JButton("Copy");
+		JButton shiftDown = new JButton("Shift Down");
+		JButton shiftUp = new JButton("Shift Up");
 		
 		// Button Listeners
 		add.addActionListener(new AddListener());
@@ -58,9 +61,12 @@ public class BVS {
 		modify.addActionListener(new ModifyListener());
 		launch.addActionListener(new LaunchListener());
 		about.addActionListener(new AboutListener());
+		copy.addActionListener(new CopyListener());
+		shiftDown.addActionListener(new ShiftDownListener());
+		shiftUp.addActionListener(new ShiftUpListener());
 		
 		// Create South Panel
-		GridLayout buttonGrid = new GridLayout(1,4);
+		GridLayout buttonGrid = new GridLayout(2,3);
 		southPanel = new JPanel(buttonGrid);
 		
 		southPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
@@ -69,6 +75,9 @@ public class BVS {
 		southPanel.add(add);
 		southPanel.add(delete);
 		southPanel.add(modify);
+		southPanel.add(copy);
+		southPanel.add(shiftUp);
+		southPanel.add(shiftDown);
 		southPanel.add(launch);
 		southPanel.add(about);
 		
@@ -116,7 +125,14 @@ public class BVS {
 	private class DeleteListener implements ActionListener {
 		public void actionPerformed(ActionEvent ev) {
 			if(entryTable.getSelectedRow() != -1) {
-				tableManager.delEntry(entryTable.getSelectedRow());
+				int result = tableManager.delEntry(entryTable.getSelectedRow());
+				
+				if(result != -1) {
+					entryTable.setRowSelectionInterval(result, result);
+				} else if(result == -1 && tableManager.getSize() != 0) {
+					entryTable.setRowSelectionInterval(0, 0);
+				}
+				
 				entryTable.repaint();
 			}
 		}
@@ -144,7 +160,16 @@ public class BVS {
 		}
 	}
 	
-	public void showAddWindow() {
+	private class CopyListener implements ActionListener {
+		public void actionPerformed(ActionEvent ev) {
+			if(entryTable.getSelectedRow() != -1) {
+				int result = tableManager.copyEntry(entryTable.getSelectedRow());
+				entryTable.setRowSelectionInterval(result, result);	
+			}
+		}
+	}
+	
+	private void showAddWindow() {
 		JFrame addWindow = new AddWindow(tableManager, entryTable, add);
 		
 		// Disable the Add Button
@@ -168,15 +193,43 @@ public class BVS {
 		}
 	}
 	
-	public void showAboutWindow() {
-		JFrame aboutWindow = new AboutWindow(name, version, author, contact, license, about);
+	private void showAboutWindow() {
+		JFrame aboutWindow = new AboutWindow(name, version, releaseDate, author, contact, license, about);
 		
 		// Disable the About Button
 		about.setEnabled(false);
 				
 		aboutWindow.setLocation(mainFrame.getLocation());
-		aboutWindow.setSize(375,200);
+		aboutWindow.setSize(400,225);
 		aboutWindow.setVisible(true);
+	}
+	
+	private class ShiftUpListener implements ActionListener {
+		public void actionPerformed(ActionEvent ev) {
+			if(entryTable.getSelectedRow() != -1) {
+				int result = tableManager.shiftUp(entryTable.getSelectedRow());
+				
+				if(result != -1) {
+					entryTable.setRowSelectionInterval(result, result);
+				} else {
+					entryTable.setRowSelectionInterval(0, 0);
+				}
+			}
+		}
+	}
+	
+	private class ShiftDownListener implements ActionListener {
+		public void actionPerformed(ActionEvent ev) {
+			if(entryTable.getSelectedRow() != -1) {
+				int result = tableManager.shiftDown(entryTable.getSelectedRow());
+				
+				if(result != -1) {
+					entryTable.setRowSelectionInterval(result, result);
+				} else {
+					entryTable.setRowSelectionInterval(tableManager.getSize()-1, tableManager.getSize()-1);
+				}
+			}
+		}
 	}
 
 	// GUI Components
@@ -196,7 +249,8 @@ public class BVS {
 	
 	// Program Information
 	private String name = "Bliss Version Switcher";
-	private String version = "1.0.3";
+	private String version = "1.0.4";
+	private String releaseDate = "Saturday, September 28, 2013";
 	private String author = "Jonathan Vasquez";
 	private String contact = "JVasquez1011@Gmail.com";
 	private String license = "MPL 2.0";

@@ -1,3 +1,11 @@
+1.0.4
+--------------
+- Added a new 'Copy' button so that you can quickly insert new entries without having to type your Path or Flags again.
+- Added 'Shift Up' and 'Shift Down' buttons so that you can quickly organize your list
+- The application now remembers your previous version when you try to modify an entry and you toggle the 'Expansion' check box multiple times.
+- When you 'Add', 'Delete', or 'Copy' an entry, the table will automatically select a remaining row. This also allows you to quickly copy and delete a lot of entries.
+- Added 'Release Date' to the About screen.
+
 1.0.3
 --------------
 - The application now supports using a 'data' folder. Meaning that the application will detect/copy/restore/delete your 'data' folders.

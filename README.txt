@@ -1,4 +1,4 @@
-Name   : Bliss Version Switcher 1.0.3
+Name   : Bliss Version Switcher 1.0.4
 Author : Jonathan Vasquez (fearedbliss)
 License: MPL 2.0
 Date   : Saturday, September 28, 2013
@@ -42,6 +42,13 @@ Instructions:
 The first time you launch the application, the application will detect the version and type (classic|expansion) and it will create the directories
 needed inside your Diablo II directory. It will also backup the files for this version so that you can switch back to them, and it will also
 edit the registry and modify the location of your save/ characters and also the default resolution to use (640x480 for Classic, 800x600 for Expansion).
+
+Instructions (If using the Classic/Expansion bundle)
+---------------
+1. Install Diablo II in <PATH> (Your choice)
+2. Open BVS and add the version that is currently installed in your Diablo II folder 
+   * If you installed D2 and it's 1.07, then Add 1.07 and run it, if you installed classic than it's probably 1.00, so add 1.00 and run it).
+3. Once you ran the last version of D2 from the launcher, now add any other version and run it.
 
 Upgrading to a new Patch:
 ---------------
