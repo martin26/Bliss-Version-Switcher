@@ -4,6 +4,8 @@
 - Added some checks so that the modify/delete buttons don't complain about "No row selected" in the background of application. This was benign but caused a slight delay.
 - Add/Modify/About buttons will now disable themselves when you are currently adding/modifying/viewing about, something. This prevents opening an infinite amount of add windows
   while never exciting the previous add window.
+- Switched version input text fields to combo boxes. These combo boxes contain all the versions for classic and expansion. Selecting/Unselecting the expansion check box will
+  dynamically update the list of available versions.
 
 1.0.2
 --------------
