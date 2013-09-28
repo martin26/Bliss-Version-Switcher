@@ -1,3 +1,10 @@
+1.0.3
+--------------
+- The application now supports using a 'data' folder. Meaning that the application will detect/copy/restore/delete your 'data' folders.
+- Added some checks so that the modify/delete buttons don't complain about "No row selected" in the background of application. This was benign but caused a slight delay.
+- Add/Modify/About buttons will now disable themselves when you are currently adding/modifying/viewing about, something. This prevents opening an infinite amount of add windows
+  while never exciting the previous add window.
+
 1.0.2
 --------------
 - Cleaned up some parts of the code

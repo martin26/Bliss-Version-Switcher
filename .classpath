@@ -5,5 +5,10 @@
 	<classpathentry kind="lib" path="D:/Applications/Libraries/commons-exec-1.1/commons-exec-1.1.jar"/>
 	<classpathentry kind="lib" path="D:/Applications/Libraries/commons-exec-1.1/commons-exec-1.1-javadoc.jar"/>
 	<classpathentry kind="lib" path="D:/Applications/Libraries/commons-exec-1.1/commons-exec-1.1-sources.jar"/>
+	<classpathentry kind="lib" path="D:/Applications/Libraries/commons-io-2.4/commons-io-2.4.jar"/>
+	<classpathentry kind="lib" path="D:/Applications/Libraries/commons-io-2.4/commons-io-2.4-javadoc.jar"/>
+	<classpathentry kind="lib" path="D:/Applications/Libraries/commons-io-2.4/commons-io-2.4-sources.jar"/>
+	<classpathentry kind="lib" path="D:/Applications/Libraries/commons-io-2.4/commons-io-2.4-tests.jar"/>
+	<classpathentry kind="lib" path="D:/Applications/Libraries/commons-io-2.4/commons-io-2.4-test-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

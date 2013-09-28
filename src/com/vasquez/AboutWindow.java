@@ -21,7 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class AboutWindow extends JFrame {
-	public AboutWindow(String name, String version, String author, String contact, String license) {
+	public AboutWindow(String name, String version, String author, String contact, String license, JButton about) {
 		super("About");
 		
 		// Set window properties
@@ -33,6 +33,7 @@ public class AboutWindow extends JFrame {
 		this.author = author;
 		this.contact = contact;
 		this.license = license;
+		this.about = about;
 		
 		// Create components and listeners
 		JButton close = new JButton("Close");
@@ -78,6 +79,7 @@ public class AboutWindow extends JFrame {
 	private class CloseListener implements ActionListener {
 		public void actionPerformed(ActionEvent ev) {
 			dispose();
+			about.setEnabled(true);
 		}
 	}
 	
@@ -86,4 +88,5 @@ public class AboutWindow extends JFrame {
 	private String author;
 	private String contact;
 	private String license;
+	private JButton about;
 }

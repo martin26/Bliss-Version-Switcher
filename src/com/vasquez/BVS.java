@@ -14,6 +14,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -45,11 +46,11 @@ public class BVS {
 		fs = new FileSwitcher();
 		
 		// Buttons on South
-		JButton add = new JButton("Add");
+		add = new JButton("Add");
 		JButton delete = new JButton("Delete");
-		JButton modify = new JButton("Modify");
+		modify = new JButton("Modify");
 		JButton launch = new JButton("Launch");
-		JButton about = new JButton("About");
+		about = new JButton("About");
 		
 		// Button Listeners
 		add.addActionListener(new AddListener());
@@ -114,8 +115,10 @@ public class BVS {
 	
 	private class DeleteListener implements ActionListener {
 		public void actionPerformed(ActionEvent ev) {
-			tableManager.delEntry(entryTable.getSelectedRow());
-			entryTable.repaint();
+			if(entryTable.getSelectedRow() != -1) {
+				tableManager.delEntry(entryTable.getSelectedRow());
+				entryTable.repaint();
+			}
 		}
 	}
 	
@@ -127,9 +130,8 @@ public class BVS {
 	
 	private class LaunchListener implements ActionListener {
 		public void actionPerformed(ActionEvent ev) {
-			if(entryTable.getSelectedRow() != -1 || entryTable.getSelectedColumn() != -1) {
+			if(entryTable.getSelectedRow() != -1) {
 				Entry ent = tableManager.getEntry(entryTable.getSelectedRow());
-				
 				fs.setEntry(ent);
 				fs.launch();
 			}
@@ -143,7 +145,10 @@ public class BVS {
 	}
 	
 	public void showAddWindow() {
-		JFrame addWindow = new AddWindow(tableManager, entryTable);
+		JFrame addWindow = new AddWindow(tableManager, entryTable, add);
+		
+		// Disable the Add Button
+		add.setEnabled(false);
 		
 		addWindow.setLocation(mainFrame.getLocation());
 		addWindow.setSize(400,175);
@@ -151,16 +156,24 @@ public class BVS {
 	}
 	
 	public void showModifyWindow() {
-		JFrame modifyWindow = new ModifyWindow(tableManager, entryTable, entryTable.getSelectedRow());
-		
-		modifyWindow.setLocation(mainFrame.getLocation());
-		modifyWindow.setSize(400,175);
-		modifyWindow.setVisible(true);
+		if(entryTable.getSelectedRow() != -1) {
+			JFrame modifyWindow = new ModifyWindow(tableManager, entryTable, entryTable.getSelectedRow(), modify);
+			
+			// Disable the Modify Button
+			modify.setEnabled(false);
+			
+			modifyWindow.setLocation(mainFrame.getLocation());
+			modifyWindow.setSize(400,175);
+			modifyWindow.setVisible(true);
+		}
 	}
 	
 	public void showAboutWindow() {
-		JFrame aboutWindow = new AboutWindow(name, version, author, contact, license);
+		JFrame aboutWindow = new AboutWindow(name, version, author, contact, license, about);
 		
+		// Disable the About Button
+		about.setEnabled(false);
+				
 		aboutWindow.setLocation(mainFrame.getLocation());
 		aboutWindow.setSize(375,200);
 		aboutWindow.setVisible(true);
@@ -173,12 +186,17 @@ public class BVS {
 	private JTable entryTable;
 	private EntryWithModel tableManager;
 	
+	// Buttons (Making these available to all class methods so that I can enable/disable them)
+	private JButton add;
+	private JButton modify;
+	private JButton about;
+	
 	// File Switcher
 	private FileSwitcher fs;
 	
 	// Program Information
 	private String name = "Bliss Version Switcher";
-	private String version = "1.0.2";
+	private String version = "1.0.3";
 	private String author = "Jonathan Vasquez";
 	private String contact = "JVasquez1011@Gmail.com";
 	private String license = "MPL 2.0";

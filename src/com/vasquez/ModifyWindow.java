@@ -13,9 +13,14 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -23,7 +28,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 
 public class ModifyWindow extends JFrame {
-	public ModifyWindow(EntryWithModel tableManager, JTable entryTable, int selectedEntry) {
+	public ModifyWindow(EntryWithModel tableManager, JTable entryTable, int selectedEntry, JButton mainModifyButton) {
 		super("Modify Entry");
 		
 		// Set window properties
@@ -33,6 +38,7 @@ public class ModifyWindow extends JFrame {
 		this.tableManager = tableManager;
 		this.entryTable = entryTable;
 		this.selectedEntry = selectedEntry;
+		this.mainModifyButton = mainModifyButton;
 		
 		// Create components and listeners
 		JButton modify = new JButton("Modify");
@@ -45,10 +51,26 @@ public class ModifyWindow extends JFrame {
 		JLabel pathL = new JLabel("Path:");
 		JLabel flagsL = new JLabel("Flags:");
 		
-		version = new JTextField(tableManager.getSelectedVersion(selectedEntry));
 		path = new JTextField(tableManager.getSelectedPath(selectedEntry));
 		flags = new JTextField(tableManager.getSelectedFlags(selectedEntry));
 		expansion = new JCheckBox("Expansion", tableManager.isSelectedExpansion(selectedEntry));
+			
+		if(expansion.isSelected()) {
+			version = new JComboBox(Listing.expansionVersions);
+		} else {
+			version = new JComboBox(Listing.classicVersions);
+		}
+	
+		expansion.addItemListener(new ExpansionListener());
+		
+		// Find the information after you get the 'expansion' check box value
+		versionIndex = getVersionIndex(tableManager.getSelectedVersion(selectedEntry));
+		
+		if(versionIndex != -1) {
+			version.setSelectedIndex(versionIndex);
+		} else {
+			dispose(); // Close the modify window to prevent damage to this version
+		}
 		
 		// Create the layout and add the components to their respective places
 		JPanel centerPanel = new JPanel(new GridLayout(3,2));
@@ -77,26 +99,64 @@ public class ModifyWindow extends JFrame {
 			
 			// If none of the fields are empty, than add the field. None of the fields can be empty or the program will crash
 			// because it won't be able to parse the values correctly.
-			if(!version.getText().isEmpty() && !path.getText().isEmpty() && !flags.getText().isEmpty()) {
-				tableManager.modifyEntry(version.getText(), path.getText(), flags.getText(), expansion.isSelected(), selectedEntry);
+			if(!path.getText().isEmpty() && !flags.getText().isEmpty()) {
+				tableManager.modifyEntry(version.getSelectedItem().toString(), path.getText(), flags.getText(), expansion.isSelected(), selectedEntry);
 			}
 			
 			entryTable.repaint();
 			dispose();
+			mainModifyButton.setEnabled(true);
 		}
 	}
 	
 	private class cancelListener implements ActionListener {
 		public void actionPerformed(ActionEvent ev) {
 			dispose();
+			mainModifyButton.setEnabled(true);
 		}
+	}
+	
+	private class ExpansionListener implements ItemListener {
+		public void itemStateChanged(ItemEvent arg0) {
+			DefaultComboBoxModel d = null;
+			if(expansion.isSelected()) {
+				d = new DefaultComboBoxModel(Listing.expansionVersions);
+				version.setModel(d);
+				version.setSelectedIndex(0);
+			} else {
+				d = new DefaultComboBoxModel(Listing.classicVersions);
+				version.setModel(d);
+				version.setSelectedIndex(0);
+			}
+		}
+	}
+	
+	// Returns the index of the version you are trying to modify in the ComboBox
+	private int getVersionIndex(String x) {
+		if(expansion.isSelected()) {
+			for(int i = 0; i < Listing.expansionVersions.length; i++) {
+				if(Listing.expansionVersions[i].equalsIgnoreCase(tableManager.getSelectedVersion(selectedEntry))) {
+					return i;
+				}
+			}
+		} else {
+			for(int i = 0; i < Listing.classicVersions.length; i++) {
+				if(Listing.classicVersions[i].equalsIgnoreCase(tableManager.getSelectedVersion(selectedEntry))) {
+					return i;
+				}
+			}
+		}
+		
+		return -1;
 	}
 	
 	private EntryWithModel tableManager;
 	private JTable entryTable;
-	private JTextField version;
+	private JComboBox version;
 	private JTextField path;
 	private JTextField flags;
 	private JCheckBox expansion;
+	private JButton mainModifyButton;
 	private int selectedEntry;
+	private int versionIndex;
 }

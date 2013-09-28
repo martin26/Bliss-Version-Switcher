@@ -1,7 +1,7 @@
-Name   : Bliss Version Switcher 1.0.2
+Name   : Bliss Version Switcher 1.0.3
 Author : Jonathan Vasquez (fearedbliss)
 License: MPL 2.0
-Date   : Thursday, September 26, 2013
+Date   : Saturday, September 28, 2013
 ------------------------------------------------
 
 Description:
@@ -61,3 +61,13 @@ Multiple Versions:
 If you want to run multiple versions of Diablo II, It is the same process as before. Downloaded the Modified D2gfx.dll from somewhere, put it in the folder
 of the Diablo II directory you want (Example: D:/Games/Diablo II/Expansion/1.09d/D2gfx.dll), and then run 1.09d from BVS. BVS will only let you run multiple
 versions of the same version you are currently running. Meaning that you cannot open Expansion 1.09d and then try to open Expansion 1.10 or Classic 1.09d, etc.
+
+Using '-direct -txt'
+---------------
+If you want to use a 'data' folder, You should launch the Diablo II version you want to use the 'data' folder with once. Once you launch Diablo II you can exit it. (This updates all application pointers)
+
+After that, add the 'data' folder you want to your Diablo II directory, and now play as normal. 
+
+Each time you exit Diablo II, it will automatically backup the 'data' folder to your target folder.
+
+When you switch Diablo II versions, the application will delete the 'data' folder that's in your D2's root directory, and it will copy the 'data' folder for the new version you want to play.

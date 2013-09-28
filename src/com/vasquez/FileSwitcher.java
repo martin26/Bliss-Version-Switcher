@@ -18,10 +18,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.io.FileUtils;
+
 import static java.nio.file.StandardCopyOption.*;
+
 
 // Switches the files to the correct version of Diablo II 
 
@@ -73,6 +77,9 @@ public class FileSwitcher {
 			
 			// Launch the game only if another D2 version isn't running
 			if(getProcessCount() == 0) {
+				// Delete the 'data' directory of the previous version if it exists in the Diablo II root
+				delDataDir();
+				
 				// Backs up the files if you don't already have a backup for this new version
 				backupFiles();
 				
@@ -145,8 +152,11 @@ public class FileSwitcher {
 			// Backup the files if they aren't already backed up
 			if(source.exists() && !dest.exists()) {
 				backupFilesHandler(source, dest);
-			}
+			}		
 		}
+		
+		// Backup the 'data' directory if it exists
+		doDataDir(0);
 	}
 	
 	private void backupFilesHandler(File source, File dest) {
@@ -182,7 +192,7 @@ public class FileSwitcher {
 					// You can copy the same files for all the other versions (Well... anything > 1.00).
 					Files.copy(sourceDll, destDll, REPLACE_EXISTING);
 				}
-			}	
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -213,6 +223,9 @@ public class FileSwitcher {
 				}
 			}
 			
+			// Restore the 'data' directory if it exists
+			doDataDir(1);
+			
 			// Switch the Expansion MPQs to different locations depending if expansion/classic
 			if(expansion == true) {
 				switchToExpansion();
@@ -221,6 +234,67 @@ public class FileSwitcher {
 				switchToClassic();
 			}
 		}
+	
+	// Backs up or restores the 'data' depending on the option
+	// Options: 0 = Backup, Non-0 = Restore
+	private void doDataDir(int choice) {
+		File source = null;
+		File dest = null;
+		
+		if(choice == 0) {
+			source = new File(root.getAbsolutePath() + "\\data\\");
+			
+			if(expansion == true) {
+				dest = new File(root.getAbsolutePath() + "\\Expansion\\" + version + "\\data\\");
+			} else {
+				dest = new File(root.getAbsolutePath() + "\\Classic\\" + version + "\\data\\");
+			}
+		} else {
+			dest = new File(root.getAbsolutePath() + "\\data\\");
+			
+			if(expansion == true) {
+				source = new File(root.getAbsolutePath() + "\\Expansion\\" + version + "\\data\\");
+			} else {
+				source = new File(root.getAbsolutePath() + "\\Classic\\" + version + "\\data\\");
+			}
+		}
+	
+		try {
+			if(source.exists() && source.isDirectory()) {
+				if(dest.exists() && dest.isDirectory()) {
+					FileUtils.deleteDirectory(dest);
+					FileUtils.copyDirectory(source, dest);
+				} else if(dest.exists() && !dest.isDirectory()) {
+					dest.delete();
+					FileUtils.copyDirectory(source, dest);
+				} else {
+					FileUtils.copyDirectory(source, dest);
+				}
+			} else if(source.exists() && !source.isDirectory()) {
+				// This is a bad file.. 'data' is suppose to be a folder not a file.
+				source.delete();
+			}
+		}
+		catch(IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	// Deletes the 'data' directory (used only if you are switching versions)
+	private void delDataDir() {
+		File source = new File(root.getAbsolutePath() + "\\data\\");
+	
+		if(source.exists() && source.isDirectory()) {
+			try {
+				FileUtils.deleteDirectory(source);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		} else if(source.exists() && !source.isDirectory()) {
+			source.delete();
+		}
+	}
 	
 	// Moves the expansion specific MPQs to the Expansion directory
 	private void switchToClassic() {
@@ -329,7 +403,18 @@ public class FileSwitcher {
 			// Wait for the process to finish. Once the process finishes, remove one from the counter
 			try {
 				resultHandler.waitFor();
-				delProcessCount();
+				
+				// Only backup the 'data' directory if it exists and only if there is only one process (Things might have changed with -direct -txt)
+				// Technically speaking this isn't completely the best way since if you opened 1 d2 and go into a game, then -direct -txt will generate bins
+				// If you open a second d2 and go into a game, -direct -txt might generate bins if you deleted the bins between the first and second process,
+				// Thus once you quit the second d2, and then quit the first d2, the application will backup, and it would actually be backing up the second
+				// d2's -direct -txt generation. However, most likely this scenario of deleting the previously generated -direct -txt files in between two
+				// running d2s will not happen. Most people open multiple copies of D2 and use the same -direct -txt throughout all of them.
+				if(getProcessCount() == 1) {
+					doDataDir(0);
+				}
+				
+				delProcessCount();		
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

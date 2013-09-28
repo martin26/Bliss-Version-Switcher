@@ -13,10 +13,15 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.WindowEvent;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -24,7 +29,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 
 public class AddWindow extends JFrame {
-	public AddWindow(EntryWithModel tableManager, JTable entryTable) {
+	public AddWindow(EntryWithModel tableManager, JTable entryTable, JButton mainAddButton) {
 		super("Add Entry");
 		
 		// Set window properties
@@ -33,6 +38,7 @@ public class AddWindow extends JFrame {
 		// Bring in the table manager and entry table resources
 		this.tableManager = tableManager;
 		this.entryTable = entryTable;
+		this.mainAddButton = mainAddButton;
 		
 		// Create components and listeners
 		JButton add = new JButton("Add");
@@ -45,11 +51,14 @@ public class AddWindow extends JFrame {
 		JLabel pathL = new JLabel("Path:");
 		JLabel flagsL = new JLabel("Flags:");
 		
-		version = new JTextField();
+		version = new JComboBox(Listing.classicVersions);
 		path = new JTextField();
 		flags = new JTextField();
 		expansion = new JCheckBox("Expansion");
 
+		expansion.addItemListener(new ExpansionListener());
+		version.setSelectedIndex(0);
+		
 		// Create the layout and add the components to their respective places
 		JPanel centerPanel = new JPanel(new GridLayout(3,2));
 		JPanel southPanel = new JPanel(new GridLayout(1,2));
@@ -74,37 +83,45 @@ public class AddWindow extends JFrame {
 	
 	private class addListener implements ActionListener {
 		public void actionPerformed(ActionEvent ev) {
-			
 			// If none of the fields are empty, than add the field. None of the fields can be empty or the program will crash
 			// because it won't be able to parse the values correctly.
-			if(!version.getText().isEmpty() && !path.getText().isEmpty() && !flags.getText().isEmpty()) {
-				tableManager.addEntry(version.getText(), path.getText(), flags.getText(), expansion.isSelected());	
+			if(!path.getText().isEmpty() && !flags.getText().isEmpty()) {
+				tableManager.addEntry(version.getSelectedItem().toString(), path.getText(), flags.getText(), expansion.isSelected());	
 			}
 			
 			entryTable.repaint();
 			dispose();
+			mainAddButton.setEnabled(true);
 		}
 	}
 	
 	private class cancelListener implements ActionListener {
 		public void actionPerformed(ActionEvent ev) {
 			dispose();
+			mainAddButton.setEnabled(true);
 		}
 	}
 	
+	private class ExpansionListener implements ItemListener {
+		public void itemStateChanged(ItemEvent arg0) {
+			DefaultComboBoxModel d = null;
+			if(expansion.isSelected()) {
+				d = new DefaultComboBoxModel(Listing.expansionVersions);
+				version.setModel(d);
+				version.setSelectedIndex(0);
+			} else {
+				d = new DefaultComboBoxModel(Listing.classicVersions);
+				version.setModel(d);
+				version.setSelectedIndex(0);
+			}
+		}
+	}
+
 	private EntryWithModel tableManager;
 	private JTable entryTable;
-	private JTextField version;
+	private JComboBox version;
 	private JTextField path;
 	private JTextField flags;
 	private JCheckBox expansion;
-	
-	// Might use this in the future for a combobox, but maybe it's better to just
-	// type it in so that it gives the user more flexibility.
-	private String[] availableVersions = {
-			"1.00", "1.01", "1.02", "1.03", "1.04", "1.04b", "1.04c",
-			"1.05", "1.05b", "1.06", "1.06b", "1.07", 
-			"1.08", "1.09", "1.09b", "1.09c", "1.09d", "1.10", "1.11",
-			"1.11b", "1.12", "1.13c", "1.13d"
-	};
+	private JButton mainAddButton;
 }
