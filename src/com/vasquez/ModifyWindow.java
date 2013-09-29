@@ -66,10 +66,13 @@ public class ModifyWindow extends JFrame {
 		// Find the information after you get the 'expansion' check box value
 		versionIndex = getVersionIndex(tableManager.getSelectedVersion(selectedEntry));
 		
+		// Makes the combo box editable so that the user can enter their own versions (New versions that Blizzard might release)
+		version.setEditable(true);
+		
 		if(versionIndex != -1) {
 			version.setSelectedIndex(versionIndex);
 		} else {
-			dispose(); // Close the modify window to prevent damage to this version
+			version.getEditor().setItem(tableManager.getSelectedVersion(entryTable.getSelectedRow()));
 		}
 		
 		// Create the layout and add the components to their respective places
@@ -123,7 +126,12 @@ public class ModifyWindow extends JFrame {
 			if(tableManager.isSelectedExpansion(selectedEntry) && expansion.isSelected()) {
 				d = new DefaultComboBoxModel(Listing.expansionVersions);
 				version.setModel(d);
-				version.setSelectedIndex(versionIndex);
+				
+				if(versionIndex != -1) {
+					version.setSelectedIndex(versionIndex);
+				} else {
+					version.getEditor().setItem(tableManager.getSelectedVersion(entryTable.getSelectedRow()));
+				}
 			} else if (tableManager.isSelectedExpansion(selectedEntry) && !expansion.isSelected()){
 				d = new DefaultComboBoxModel(Listing.classicVersions);
 				version.setModel(d);
@@ -135,7 +143,12 @@ public class ModifyWindow extends JFrame {
 			} else if (!tableManager.isSelectedExpansion(selectedEntry) && !expansion.isSelected()){
 				d = new DefaultComboBoxModel(Listing.classicVersions);
 				version.setModel(d);
-				version.setSelectedIndex(versionIndex);
+				
+				if(versionIndex != -1) {
+					version.setSelectedIndex(versionIndex);
+				} else {
+					version.getEditor().setItem(tableManager.getSelectedVersion(entryTable.getSelectedRow()));
+				}
 			}
 		}
 	}

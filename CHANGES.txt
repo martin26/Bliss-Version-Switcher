@@ -1,3 +1,10 @@
+1.0.5
+--------------
+- Fixed a bug where the data folder wasn't being deleted from the backups when you deleted them from the D2's root directory
+ (and thus were restored during the next version switch back).
+- The drop down list that displays the available D2 versions is now editable. Which means that if Blizzard releases a new version that is
+  not on the list, you will still be able to backup and manage that version within the switcher.
+
 1.0.4
 --------------
 - Added a new 'Copy' button so that you can quickly insert new entries without having to type your Path or Flags again.

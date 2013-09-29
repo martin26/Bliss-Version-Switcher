@@ -69,6 +69,9 @@ public class FileSwitcher {
 			runGame();
 		} 
 		else if(getLastVersion().equalsIgnoreCase(version.toString()) && lastRanType == expansion) {
+			// Delete the 'data' directory in the backup if the game doesn't have a 'data' directory in the root
+			delDataDir(1);
+			
 			// Since this was the last version you were playing, just start the game.
 			runGame();
 		}
@@ -78,7 +81,7 @@ public class FileSwitcher {
 			// Launch the game only if another D2 version isn't running
 			if(getProcessCount() == 0) {
 				// Delete the 'data' directory of the previous version if it exists in the Diablo II root
-				delDataDir();
+				delDataDir(0);
 				
 				// Backs up the files if you don't already have a backup for this new version
 				backupFiles();
@@ -199,41 +202,41 @@ public class FileSwitcher {
 	}
 	
 	// Restore the files for the version you want to play
-		private void restoreFiles() {
-			for(String x: requiredFiles) {
-				File source = null;
-				File dest = new File(root.getAbsolutePath() + "\\" + x);
-				
-				// Sets the path depending if it's an expansion or classic entry
-				if(expansion == true) {
-					source = new File(root.getAbsolutePath() + "\\Expansion\\" + version + "\\" + x);
-				} else {
-					source = new File(root.getAbsolutePath() + "\\Classic\\" + version + "\\" + x);
-				}
-
-				Path sourceDll = Paths.get(source.getAbsolutePath());
-				Path destDll = Paths.get(dest.getAbsolutePath());
-					
-				if(source.exists()) {
-					try {
-						Files.copy(sourceDll, destDll, REPLACE_EXISTING);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
+	private void restoreFiles() {
+		for(String x: requiredFiles) {
+			File source = null;
+			File dest = new File(root.getAbsolutePath() + "\\" + x);
 			
-			// Restore the 'data' directory if it exists
-			doDataDir(1);
-			
-			// Switch the Expansion MPQs to different locations depending if expansion/classic
+			// Sets the path depending if it's an expansion or classic entry
 			if(expansion == true) {
-				switchToExpansion();
+				source = new File(root.getAbsolutePath() + "\\Expansion\\" + version + "\\" + x);
+			} else {
+				source = new File(root.getAbsolutePath() + "\\Classic\\" + version + "\\" + x);
 			}
-			else {
-				switchToClassic();
+
+			Path sourceDll = Paths.get(source.getAbsolutePath());
+			Path destDll = Paths.get(dest.getAbsolutePath());
+				
+			if(source.exists()) {
+				try {
+					Files.copy(sourceDll, destDll, REPLACE_EXISTING);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
+			
+		// Restore the 'data' directory if it exists
+		doDataDir(1);
+		
+		// Switch the Expansion MPQs to different locations depending if expansion/classic
+		if(expansion == true) {
+			switchToExpansion();
+		}
+		else {
+			switchToClassic();
+		}
+	}
 	
 	// Backs up or restores the 'data' depending on the option
 	// Options: 0 = Backup, Non-0 = Restore
@@ -280,22 +283,43 @@ public class FileSwitcher {
 		}
 	}
 	
-	// Deletes the 'data' directory (used only if you are switching versions)
-	private void delDataDir() {
+	// Deletes the 'data' directory depending the situation
+	// Options: 0 = Deletes data dir in root
+	//			1 = Deletes data dir in backup if data dir in root doesn't exist
+	private void delDataDir(int choice) {
 		File source = new File(root.getAbsolutePath() + "\\data\\");
-	
-		if(source.exists() && source.isDirectory()) {
-			try {
-				FileUtils.deleteDirectory(source);
-			} catch (IOException e) {
-				e.printStackTrace();
+		
+		if(choice == 0) {
+			if(source.exists() && source.isDirectory()) {
+				try {
+					FileUtils.deleteDirectory(source);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else if(source.exists() && !source.isDirectory()) {
+				source.delete();
 			}
+		} else if(choice != 0 && !source.exists()) {
+			File backup = null;
 			
-		} else if(source.exists() && !source.isDirectory()) {
-			source.delete();
+			if(expansion == true) {
+				backup = new File(root.getAbsolutePath() + "\\Expansion\\" + version + "\\data\\");
+			} else {
+				backup = new File(root.getAbsolutePath() + "\\Classic\\" + version + "\\data\\");
+			}
+				
+			if(backup.exists() && backup.isDirectory()) {
+				try {
+					FileUtils.deleteDirectory(backup);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else if(backup.exists() && !backup.isDirectory()) {
+				backup.delete();
+			}
 		}
 	}
-	
+
 	// Moves the expansion specific MPQs to the Expansion directory
 	private void switchToClassic() {
 		for(String y: expansionMPQs) {

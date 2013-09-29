@@ -57,6 +57,7 @@ public class AddWindow extends JFrame {
 		expansion = new JCheckBox("Expansion");
 
 		expansion.addItemListener(new ExpansionListener());
+		version.setEditable(true);
 		version.setSelectedIndex(0);
 		
 		// Create the layout and add the components to their respective places
