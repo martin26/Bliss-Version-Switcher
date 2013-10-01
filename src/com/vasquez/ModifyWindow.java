@@ -99,11 +99,9 @@ public class ModifyWindow extends JFrame {
 	
 	private class modifyListener implements ActionListener {
 		public void actionPerformed(ActionEvent ev) {
-			
-			// If none of the fields are empty, than add the field. None of the fields can be empty or the program will crash
-			// because it won't be able to parse the values correctly.
-			if(!path.getText().isEmpty() && !flags.getText().isEmpty()) {
+			if(!version.getSelectedItem().toString().isEmpty() && !path.getText().isEmpty()) {
 				tableManager.modifyEntry(version.getSelectedItem().toString(), path.getText(), flags.getText(), expansion.isSelected(), selectedEntry);
+				entryTable.setRowSelectionInterval(selectedEntry, selectedEntry);
 			}
 			
 			entryTable.repaint();

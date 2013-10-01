@@ -10,12 +10,6 @@
 package com.vasquez;
 
 public class Entry {
-	public Entry() {
-		version = "No Version";
-		path = "No Path";
-		flags = "No Flags";
-		expansion = false;
-	}
 	public Entry(String version, String path, String flags, boolean expansion) {
 		this.version = version;
 		this.path = path;
@@ -51,6 +45,7 @@ public class Entry {
 	public String getVersion() { return version; }
 	public String getPath() { return path; }
 	public String getFlags() { return flags; }
+	
 	public boolean isExpansion() { return expansion; }
 	
 	public String[] getSplitFlags() {

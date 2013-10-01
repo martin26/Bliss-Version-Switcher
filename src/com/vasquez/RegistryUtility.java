@@ -10,9 +10,14 @@
 package com.vasquez;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecuteResultHandler;
+import org.apache.commons.exec.DefaultExecutor;
 
 public class RegistryUtility {
 	public RegistryUtility(String rootDir, String version, boolean expansion) {
@@ -24,7 +29,7 @@ public class RegistryUtility {
 	
 	public void update() {
 		prepareRegistryFile();
-		updateRegistry();
+		updateRegistry();	
 	}
 	
 	// This will prepare a registry file with the correct save path. We will use this file and feed it to the 'reg' application
@@ -49,7 +54,7 @@ public class RegistryUtility {
 				// Make sure the resolution is 640x480 or the game will crash when you try to load your character
 				bw.write("\"Resolution\"=dword:00000000\r\n");
 			}
-						
+			
 			bw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -57,11 +62,34 @@ public class RegistryUtility {
 	}
 	
 	private void updateRegistry() {
+		String line = "REG.EXE IMPORT " + registryFile;
+		CommandLine cmdLine = CommandLine.parse(line);
+		DefaultExecutor launcher = new DefaultExecutor();
+		DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
+		
+		// Launch the process
 		try {
-			List<String> params = java.util.Arrays.asList("REG.EXE", "IMPORT", registryFile);
-			Process p = new ProcessBuilder(params).start();
+			launcher.execute(cmdLine, resultHandler);
+			
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+			
+		// Wait for the process to finish. Once the process finishes, remove the SavePath.reg file
+		try {
+			resultHandler.waitFor();
+			deleteRegFile();
+		}  catch (InterruptedException e) {
+			e.printStackTrace();
+		}	
+	}
+	
+	// Delete the SavePath.reg file since we are done using it
+	private void deleteRegFile() {
+		File savePath = new File(registryFile);
+		
+		if(savePath.exists()) {
+			savePath.delete();
 		}
 	}
 	

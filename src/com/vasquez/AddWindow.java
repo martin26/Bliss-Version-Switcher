@@ -84,18 +84,17 @@ public class AddWindow extends JFrame {
 	
 	private class addListener implements ActionListener {
 		public void actionPerformed(ActionEvent ev) {
-			// If none of the fields are empty, than add the field. None of the fields can be empty or the program will crash
-			// because it won't be able to parse the values correctly.
+			// Used to set the row to the new value added to the list
 			int result = 0;
 			
-			if(!path.getText().isEmpty() && !flags.getText().isEmpty()) {
-				result = tableManager.addEntry(version.getSelectedItem().toString(), path.getText(), flags.getText(), expansion.isSelected());	
+			if(!version.getSelectedItem().toString().isEmpty() && !path.getText().isEmpty()) {
+				result = tableManager.addEntry(version.getSelectedItem().toString(), path.getText(), flags.getText(), expansion.isSelected());
+				entryTable.setRowSelectionInterval(result, result);
 			}
 			
 			entryTable.repaint();
 			dispose();
-			mainAddButton.setEnabled(true);
-			entryTable.setRowSelectionInterval(result, result);
+			mainAddButton.setEnabled(true);	
 		}
 	}
 	

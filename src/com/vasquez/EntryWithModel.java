@@ -31,8 +31,10 @@ public class EntryWithModel {
     	return peModel.addEntry(version, path, flags, expansion);
     }
     
-    public void modifyEntry(String version, String path, String flags, boolean expansion, int e) {
+    public int modifyEntry(String version, String path, String flags, boolean expansion, int e) {
     	peModel.modifyEntry(version, path, flags, expansion, e);
+    	
+    	return e;
     }
     
     public int delEntry(int e) {
@@ -102,8 +104,10 @@ public class EntryWithModel {
     	try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(entriesFile));
 			
+			// Ending the entry with a '0' so that if the path is null, it would just assign it a null value and proceed to the 0.
+			// aka, using the same technique Blizzard uses in their data/global/excel entries to terminate data lines
 			for(Entry entry: list) {
-				bw.write(entry.getVersion() + ";" + entry.isExpansion() + ";" + entry.getPath() + ";" + entry.getFlags() + "\r\n");
+				bw.write(entry.getVersion() + ";" + entry.isExpansion() + ";" + entry.getPath() + ";" + entry.getFlags() + ";0;\r\n");
 			}
 			
 			bw.close();
@@ -129,12 +133,26 @@ public class EntryWithModel {
     		
 			BufferedReader br = new BufferedReader(new FileReader(entriesFile));
 			
-			String line;
+			String line = null;
 			
 			while((line = br.readLine()) != null) {
 				String[] result = line.split(";");
-		
-				list.add(new Entry(result[0], result[2], result[3], Boolean.parseBoolean(result[1])));
+				
+				try {
+					list.add(new Entry(result[0], result[2], result[3], Boolean.parseBoolean(result[1])));
+				}
+				catch(Exception e) {
+					System.out.println("Corrupted File. Recreating...");
+					
+					// Closing the buffer so that we can delete the file, then reopening it.
+					br.close();
+					
+					if(ent.exists() && ent.delete()) {
+						ent.createNewFile();
+					}
+					
+					br = new BufferedReader(new FileReader(entriesFile));
+				}
 			}
 			
 			br.close();
@@ -214,7 +232,7 @@ public class EntryWithModel {
     	     return list.size()-1;
     	}
     	
-    	public void modifyEntry(String version, String path, String flags, boolean expansion, int e) {
+    	public int modifyEntry(String version, String path, String flags, boolean expansion, int e) {
     		Entry t = list.get(e);
     		
     		t.setVersion(version);
@@ -224,6 +242,8 @@ public class EntryWithModel {
     		
    	     	saveData();
    	     	fireTableDataChanged();
+   	     	
+   	     	return e;
     	}
     	
 	    public int delEntry(int entry) {	

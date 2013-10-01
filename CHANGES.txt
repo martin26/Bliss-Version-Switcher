@@ -1,3 +1,12 @@
+1.0.6
+--------------
+- Modify button will now automatically select the row that you were editing after you are done editing it.
+- Fixed a bug where a user wasn't allowed to create an entry with no flags
+- Fixed a bug where the application would still try to add/set the row when a person adds an entry without a version
+- If the application detects that an Entries.txt file is corrupt, it will automatically delete the file and make a new one.
+  * Which means you no longer have to actually go into your computer and delete this rogue file.
+- The application now deletes the 'SavePath.reg' file when it's done using it
+
 1.0.5
 --------------
 - Fixed a bug where the data folder wasn't being deleted from the backups when you deleted them from the D2's root directory
