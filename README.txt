@@ -1,7 +1,7 @@
-Name   : Bliss Version Switcher 1.0.6
+Name   : Bliss Version Switcher 1.0.7
 Author : Jonathan Vasquez (fearedbliss)
 License: MPL 2.0
-Date   : Tuesday, October 1, 2013
+Date   : Wednesday, October 2, 2013
 ------------------------------------------------
 
 Description:

@@ -249,8 +249,8 @@ public class BVS {
 	
 	// Program Information
 	private String name = "Bliss Version Switcher";
-	private String version = "1.0.6";
-	private String releaseDate = "Tuesday, October 1, 2013";
+	private String version = "1.0.7";
+	private String releaseDate = "Wednesday, October 2, 2013";
 	private String author = "Jonathan Vasquez";
 	private String contact = "JVasquez1011@Gmail.com";
 	private String license = "MPL 2.0";

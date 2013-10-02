@@ -1,3 +1,7 @@
+1.0.7
+--------------
+- Fixed a bug where the 'SavePath' wasn't being updated correctly due to some old debug code
+
 1.0.6
 --------------
 - Modify button will now automatically select the row that you were editing after you are done editing it.

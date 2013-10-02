@@ -13,7 +13,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
@@ -43,13 +42,13 @@ public class RegistryUtility {
 			
 			// Sets the path depending if it's an expansion or classic entry
 			if(expansion == true) {
-				bw.write("\"Save Path\"=\"D:\\\\Games\\\\Diablo II\\\\Expansion\\\\" + version + "\\\\save\\\\\"\r\n");
+				bw.write("\"Save Path\"=\"" + getSavePath() + "Expansion\\\\" + version + "\\\\save\\\\\"\r\n");
 				
 				// Set the resolution to 800x600 (For convenience, not a necessity)
 				bw.write("\"Resolution\"=dword:00000001\r\n");
 			}
 			else {
-				bw.write("\"Save Path\"=\"D:\\\\Games\\\\Diablo II\\\\Classic\\\\" + version + "\\\\save\\\\\"\r\n");
+				bw.write("\"Save Path\"=\"" + getSavePath() + "Classic\\\\" + version + "\\\\save\\\\\"\r\n");
 				
 				// Make sure the resolution is 640x480 or the game will crash when you try to load your character
 				bw.write("\"Resolution\"=dword:00000000\r\n");
@@ -93,7 +92,11 @@ public class RegistryUtility {
 		}
 	}
 	
-	private String savePath;
+	// Gets the SavePath in a format that the Windows Registry can understand (aka double slashes)
+	private String getSavePath() {
+		return rootDir.replace("\\", "\\\\") + "\\\\";
+	}
+	
 	private String rootDir;
 	private String version;
 	private boolean expansion;
