@@ -1,3 +1,9 @@
+1.0.8
+--------------
+- Fixed a visual problem where the bottom of the scroll panel was being cut off by the buttons.
+- Included a script and instructions which Windows Vista or Higher users can use to get UAC-related permissions 
+for BIS and Diablo II.exe/Game.exe
+
 1.0.7
 --------------
 - Fixed a bug where the 'SavePath' wasn't being updated correctly due to some old debug code
