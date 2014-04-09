@@ -1,3 +1,8 @@
+1.0.9
+--------------
+- Relicensed to the more permissive, Apache License 2.0
+- Minor code changes
+
 1.0.8
 --------------
 - Fixed a visual problem where the bottom of the scroll panel was being cut off by the buttons.

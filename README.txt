@@ -1,7 +1,7 @@
-Name   : Bliss Version Switcher 1.0.8
+Name   : Bliss Version Switcher 1.0.9
 Author : Jonathan Vasquez (fearedbliss)
-License: MPL 2.0
-Date   : Wednesday, December 11, 2013
+License: Apache License 2.0
+Date   : Tuesday, April 8, 2014
 ------------------------------------------------
 
 Description:
@@ -19,9 +19,9 @@ Structure:
 ---------------
 The directory structure that BVS uses is as follows:
 
-Diablo II/				- (Your Diablo II directory)
-Diablo II/Classic			- All your classic versions will be in here
-Diablo II/Classic/<version>		- Location of your Diablo II files for this version.
+Diablo II/				            - (Your Diablo II directory)
+Diablo II/Classic			        - All your classic versions will be in here
+Diablo II/Classic/<version>		    - Location of your Diablo II files for this version.
 Diablo II/Classic/<version>/data	- Data folder (If you have one)
 Diablo II/Classic/<version>/save	- Location of your save file for this specific version of classic
 
@@ -93,7 +93,6 @@ versions of the same version you are currently running. Meaning that you cannot 
 
 Using '-direct -txt'
 ---------------
-
 If you want to use a 'data' folder, You should launch the Diablo II version you want to use the 'data' folder with once.
 Once you launch Diablo II you can exit it. (This updates all application pointers)
 

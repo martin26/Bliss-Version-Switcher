@@ -1,4 +1,4 @@
-This project uses some function calls from the below projects:
+This project uses some function calls from the following projects:
 
 You can find their license at http://www.apache.org/licenses/LICENSE-2.0
 

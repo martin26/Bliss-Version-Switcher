@@ -1,11 +1,18 @@
 /* 
- * Copyright (C) 2013 Jonathan Vasquez <jvasquez1011@gmail.com>
+ * Copyright 2013-2014 Jonathan Vasquez <jvasquez1011@gmail.com>
  * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at:
  *
- * */
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.vasquez;
 
@@ -25,7 +32,6 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.io.FileUtils;
 
 import static java.nio.file.StandardCopyOption.*;
-
 
 // Switches the files to the correct version of Diablo II 
 
@@ -115,7 +121,7 @@ public class FileSwitcher {
 		File saveDir = null;
 		
 		// Sets the path depending if it's an expansion or classic entry
-		if(expansion == true) {
+		if(expansion) {
 			saveDir = new File(root.getAbsolutePath() + "\\Expansion\\" + version + "\\save\\");
 		} 
 		else {
@@ -145,7 +151,7 @@ public class FileSwitcher {
 			File dest = null;
 			
 			// Sets the path depending if it's an expansion or classic entry
-			if(expansion == true) {
+			if(expansion) {
 				dest = new File(root.getAbsolutePath() + "\\Expansion\\" + version + "\\" + x);
 			} 
 			else {
@@ -169,7 +175,7 @@ public class FileSwitcher {
 		// Check to see if the version is 1.00/1.07 and if it is then don't copy some files
 		try {
 			// Expansion
-			if(expansion == true) {
+			if(expansion) {
 				if(version.equalsIgnoreCase("1.07") && !source.getName().equalsIgnoreCase("Patch_D2.mpq")) {
 					Files.copy(sourceDll, destDll, REPLACE_EXISTING);	
 				} 
@@ -208,7 +214,7 @@ public class FileSwitcher {
 			File dest = new File(root.getAbsolutePath() + "\\" + x);
 			
 			// Sets the path depending if it's an expansion or classic entry
-			if(expansion == true) {
+			if(expansion) {
 				source = new File(root.getAbsolutePath() + "\\Expansion\\" + version + "\\" + x);
 			} else {
 				source = new File(root.getAbsolutePath() + "\\Classic\\" + version + "\\" + x);
@@ -230,7 +236,7 @@ public class FileSwitcher {
 		doDataDir(1);
 		
 		// Switch the Expansion MPQs to different locations depending if expansion/classic
-		if(expansion == true) {
+		if(expansion) {
 			switchToExpansion();
 		}
 		else {
@@ -247,7 +253,7 @@ public class FileSwitcher {
 		if(choice == 0) {
 			source = new File(root.getAbsolutePath() + "\\data\\");
 			
-			if(expansion == true) {
+			if(expansion) {
 				dest = new File(root.getAbsolutePath() + "\\Expansion\\" + version + "\\data\\");
 			} else {
 				dest = new File(root.getAbsolutePath() + "\\Classic\\" + version + "\\data\\");
@@ -255,7 +261,7 @@ public class FileSwitcher {
 		} else {
 			dest = new File(root.getAbsolutePath() + "\\data\\");
 			
-			if(expansion == true) {
+			if(expansion) {
 				source = new File(root.getAbsolutePath() + "\\Expansion\\" + version + "\\data\\");
 			} else {
 				source = new File(root.getAbsolutePath() + "\\Classic\\" + version + "\\data\\");
@@ -302,7 +308,7 @@ public class FileSwitcher {
 		} else if(choice != 0 && !source.exists()) {
 			File backup = null;
 			
-			if(expansion == true) {
+			if(expansion) {
 				backup = new File(root.getAbsolutePath() + "\\Expansion\\" + version + "\\data\\");
 			} else {
 				backup = new File(root.getAbsolutePath() + "\\Classic\\" + version + "\\data\\");
@@ -396,8 +402,11 @@ public class FileSwitcher {
 	}
 	
 	private String getGameType() {
-		if(expansion == true) { return "Expansion"; }
-		else { return "Classic"; }
+		if (expansion) {
+			return "Expansion";
+		} else {
+			return "Classic";
+		}
 	}
 	
 	public class LauncherRunnable implements Runnable {
@@ -428,12 +437,13 @@ public class FileSwitcher {
 			try {
 				resultHandler.waitFor();
 				
-				// Only backup the 'data' directory if it exists and only if there is only one process (Things might have changed with -direct -txt)
-				// Technically speaking this isn't completely the best way since if you opened 1 d2 and go into a game, then -direct -txt will generate bins
-				// If you open a second d2 and go into a game, -direct -txt might generate bins if you deleted the bins between the first and second process,
-				// Thus once you quit the second d2, and then quit the first d2, the application will backup, and it would actually be backing up the second
-				// d2's -direct -txt generation. However, most likely this scenario of deleting the previously generated -direct -txt files in between two
-				// running d2s will not happen. Most people open multiple copies of D2 and use the same -direct -txt throughout all of them.
+				/* Only backup the 'data' directory if it exists and only if there is only one process (Things might have changed with -direct -txt)
+				 * Technically speaking this isn't completely the best way since if you opened 1 d2 and go into a game, then -direct -txt will generate bins
+				 * If you open a second d2 and go into a game, -direct -txt might generate bins if you deleted the bins between the first and second process,
+				 * Thus once you quit the second d2, and then quit the first d2, the application will backup, and it would actually be backing up the second
+				 * d2's -direct -txt generation. However, most likely this scenario of deleting the previously generated -direct -txt files in between two
+				 * running d2s will not happen. Most people open multiple copies of D2 and use the same -direct -txt throughout all of them.
+				 */
 				if(getProcessCount() == 1) {
 					doDataDir(0);
 				}
