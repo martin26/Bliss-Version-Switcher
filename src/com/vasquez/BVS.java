@@ -1,17 +1,9 @@
 /* 
  * Copyright 2013-2014 Jonathan Vasquez <jvasquez1011@gmail.com>
  * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at:
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
 package com.vasquez;
@@ -46,7 +38,7 @@ public class BVS {
 		// Create Frame
 		mainFrame = new JFrame(name + " " + version);
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		mainFrame.setSize(500,300);
+		mainFrame.setSize(490,285);
 		mainFrame.setLocationRelativeTo(null); // Center the application
 		
 		// Create File Switcher
@@ -76,7 +68,7 @@ public class BVS {
 		GridLayout buttonGrid = new GridLayout(2,3);
 		southPanel = new JPanel(buttonGrid);
 		
-		southPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+		southPanel.setBorder(BorderFactory.createEmptyBorder(0,5,5,5));
 		mainFrame.getContentPane().add(BorderLayout.SOUTH, southPanel);
 		
 		southPanel.add(add);
@@ -90,6 +82,7 @@ public class BVS {
 		
 		// Create Center Panel
 		centerPanel = new JPanel();
+		centerPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
 		mainFrame.getContentPane().add(BorderLayout.CENTER, centerPanel);
 		
 		// Table Stuff (List that contains data)
@@ -97,8 +90,8 @@ public class BVS {
 		entryTable = new JTable(tableManager.getModel());
 		
 		JScrollPane tableScroller = new JScrollPane(entryTable);
-		tableScroller.setPreferredSize(new Dimension(470,180));
-		tableScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		tableScroller.setPreferredSize(new Dimension(462,180));
+		tableScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 			
 		entryTable.setFillsViewportHeight(true);
 		entryTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -257,9 +250,9 @@ public class BVS {
 	
 	// Program Information
 	private String name = "Bliss Version Switcher";
-	private String version = "1.0.9";
-	private String releaseDate = "Tuesday, April 8, 2014";
+	private String version = "1.1.0";
+	private String releaseDate = "Sunday, June 29, 2014";
 	private String author = "Jonathan Vasquez";
 	private String contact = "JVasquez1011@Gmail.com";
-	private String license = "Apache License 2.0";
+	private String license = "MPL 2.0";
 }

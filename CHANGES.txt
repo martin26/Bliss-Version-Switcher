@@ -1,3 +1,11 @@
+1.1.0
+--------------
+- Relicensed back to MPL 2.0
+- The scroll bar for the program will only show once you add enough entries into the list.
+  This enables you to have more screen real estate when you are below this threshold.
+- Some labels were improved in the UI in order to be more informative
+- The UI itself has been compacted in order to save more space.
+
 1.0.9
 --------------
 - Relicensed to the more permissive, Apache License 2.0
