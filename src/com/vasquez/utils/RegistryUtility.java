@@ -1,21 +1,17 @@
 /* 
- * Copyright 2013-2014 Jonathan Vasquez <jvasquez1011@gmail.com>
+ * Copyright 2013-2015 Jonathan Vasquez <jvasquez1011@gmail.com>
  * 
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.vasquez;
+package com.vasquez.utils;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecuteResultHandler;
-import org.apache.commons.exec.DefaultExecutor;
 
 public class RegistryUtility {
 	public RegistryUtility(String rootDir, String version, boolean expansion) {
@@ -60,26 +56,24 @@ public class RegistryUtility {
 	}
 	
 	private void updateRegistry() {
-		String line = "REG.EXE IMPORT " + registryFile;
-		CommandLine cmdLine = CommandLine.parse(line);
-		DefaultExecutor launcher = new DefaultExecutor();
-		DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
+		String[] command = {"REG.EXE", "IMPORT", registryFile};
+		ProcessBuilder processBuilder = new ProcessBuilder(command);
 		
 		// Launch the process
 		try {
-			launcher.execute(cmdLine, resultHandler);
+			Process process = processBuilder.start();
+			
+			// Wait for the process to finish. Once the process finishes, remove the SavePath.reg file
+			try {
+				process.waitFor();
+				deleteRegFile();
+			}  catch (InterruptedException e) {
+				e.printStackTrace();
+			}	
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-			
-		// Wait for the process to finish. Once the process finishes, remove the SavePath.reg file
-		try {
-			resultHandler.waitFor();
-			deleteRegFile();
-		}  catch (InterruptedException e) {
-			e.printStackTrace();
-		}	
 	}
 	
 	// Delete the SavePath.reg file since we are done using it

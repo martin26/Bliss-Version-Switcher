@@ -1,5 +1,5 @@
 /* 
- * Copyright 2013-2014 Jonathan Vasquez <jvasquez1011@gmail.com>
+ * Copyright 2013-2015 Jonathan Vasquez <jvasquez1011@gmail.com>
  * 
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -15,7 +15,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+
 import javax.swing.table.AbstractTableModel;
+
+import com.vasquez.utils.Logger;
 
 public class EntryWithModel {
 	public EntryWithModel() {
@@ -77,10 +80,10 @@ public class EntryWithModel {
 	}
     
     public void printList() {
-    	System.out.println("Version\tPath\tFlags");
+    	Logger.LogInfo("Version\tPath\tFlags");
     	
     	for(Entry e: list) {
-    		System.out.println(e.getVersion() + "\t" + e.getPath() + "\t" + e.getFlags());
+    		Logger.LogInfo(e.getVersion() + "\t" + e.getPath() + "\t" + e.getFlags());
     	}
     }
     
@@ -141,7 +144,7 @@ public class EntryWithModel {
 					list.add(new Entry(result[0], result[2], result[3], Boolean.parseBoolean(result[1])));
 				}
 				catch(Exception e) {
-					System.out.println("Corrupted File. Recreating...");
+					Logger.LogWarning("Corrupted File. Recreating...");
 					
 					// Closing the buffer so that we can delete the file, then reopening it.
 					br.close();

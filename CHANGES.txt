@@ -1,3 +1,11 @@
+1.2.0
+--------------
+- Some refactoring was done
+- New logging structure implemented
+- Some minor code cleanups
+- Removed some DRY
+- Improved 'data' dir backup. It will only backup once you close all of your d2 processes.
+
 1.1.0
 --------------
 - Relicensed back to MPL 2.0

@@ -1,15 +1,6 @@
-This project uses some function calls from the following projects:
-
-You can find their license at http://www.apache.org/licenses/LICENSE-2.0
-
-Apache Commons Exec
-Copyright 2005-2010 The Apache Software Foundation
-
-This product includes software developed by
-The Apache Software Foundation (http://www.apache.org/).
-
 Apache Commons IO
 Copyright 2002-2012 The Apache Software Foundation
 
 This product includes software developed by
 The Apache Software Foundation (http://www.apache.org/).
+

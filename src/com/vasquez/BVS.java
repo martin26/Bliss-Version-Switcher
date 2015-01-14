@@ -1,5 +1,5 @@
 /* 
- * Copyright 2013-2014 Jonathan Vasquez <jvasquez1011@gmail.com>
+ * Copyright 2013-2015 Jonathan Vasquez <jvasquez1011@gmail.com>
  * 
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -24,9 +24,13 @@ import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.table.TableColumn;
 
+import com.vasquez.utils.Logger;
+
 public class BVS {
 	public static void main(String[] args) {
-	  javax.swing.SwingUtilities.invokeLater(new Runnable() {
+		Logger.EnableLogging();
+		
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
             	BVS gui = new BVS();    	
         		gui.start();
@@ -250,8 +254,8 @@ public class BVS {
 	
 	// Program Information
 	private String name = "Bliss Version Switcher";
-	private String version = "1.1.0";
-	private String releaseDate = "Sunday, June 29, 2014";
+	private String version = "1.2.0";
+	private String releaseDate = "Friday, January 16, 2015";
 	private String author = "Jonathan Vasquez";
 	private String contact = "JVasquez1011@Gmail.com";
 	private String license = "MPL 2.0";

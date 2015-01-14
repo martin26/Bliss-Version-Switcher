@@ -1,12 +1,12 @@
-Name   : Bliss Version Switcher 1.1.0
-Author : Jonathan Vasquez (fearedbliss)
+Name   : Bliss Version Switcher 1.2.0
+Author : Jonathan Vasquez (fearedbliss) <jvasquez1011@gmail.com>
 License: MPL 2.0
-Date   : Sunday, June 29, 2014
+Date   : Friday, January 16, 2015
 ------------------------------------------------
 
 Description:
 ---------------
-This is a simple Java based application that will help you manage/launch multiple versions of Diablo II from a single Window.
+This is a simple Java based application that will help you manage/launch multiple versions of Diablo II from a single window.
 
 This means you can easily install and play every single version of Diablo II from 1.00 to the latest 1.13d (and any other future versions)
 while maximizing your disk space (Since you won't have to keep having multiple copies of your MPQs), and having complete character isolation.
@@ -93,16 +93,11 @@ versions of the same version you are currently running. Meaning that you cannot 
 
 Using '-direct -txt'
 ---------------
-If you want to use a 'data' folder, You should launch the Diablo II version you want to use the 'data' folder with once.
-Once you launch Diablo II you can exit it. (This updates all application pointers)
+If the last version of Diablo II you played is the one you want to play now (but with a data folder),
+place the 'data' folder in your Diablo II's root directory and it will be backed up once you close
+the last Diablo II process (If you are running multiple clients).
 
-After that, add the 'data' folder you want to your Diablo II directory, and now play as normal. 
+If the last version you played is different than the one you want to switch to, place the 'data' folder
+in its corresponding subfolder (Example: Expansion/1.13d/data), so that once you switch into this
+version, the 'data' folder will be automatically copied.
 
-Each time you exit Diablo II, it will automatically backup the 'data' folder to your target folder.
-
-When you switch Diablo II versions, the application will delete the 'data' folder that's in your D2's root directory, 
-and it will copy the 'data' folder for the new version you want to play.
-
-If you want to delete your data folder, close D2 if you are still playing it, delete the data folder from the D2 root directory,
-and now run the same version again. The application will then detect that you are running the same version as before, but that there is
-no 'data folder' in the root directory, meanwhile there is one in the backup. It will go to the backup and delete the 'data' folder there.
