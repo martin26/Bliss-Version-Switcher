@@ -1,3 +1,7 @@
+1.2.1
+--------------
+- Relicensed to Simplified BSD License
+
 1.2.0
 --------------
 - Some refactoring was done
@@ -22,7 +26,7 @@
 1.0.8
 --------------
 - Fixed a visual problem where the bottom of the scroll panel was being cut off by the buttons.
-- Included a script and instructions which Windows Vista or Higher users can use to get UAC-related permissions 
+- Included a script and instructions which Windows Vista or Higher users can use to get UAC-related permissions
 for BIS and Diablo II.exe/Game.exe
 
 1.0.7
@@ -71,9 +75,9 @@ for BIS and Diablo II.exe/Game.exe
 
 - Fixed a bug where the program wouldn't switch to the correct (expansion|classic) if the last
   version you ran was equal to the version you want to run for the other.
-  
+
   * Example: If the last version you played was 1.13d expansion but then wanted to play 1.13d classic, it would open 1.13d expansion again.
-  
+
 - Fixed a bug where if you had one Diablo II version open, and you opened another version of D2, the registry values/save path would update
   but then the current running Diablo II game would be out of sync with the system values. Thus, now the program makes sure that you can only run
   multiple copies of identical version/type of the game. Meaning if you opened classic 1.06b, you can run another classic 1.06b, but you can't run

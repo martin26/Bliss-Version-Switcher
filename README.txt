@@ -1,7 +1,7 @@
-Name   : Bliss Version Switcher 1.2.0
+Name   : Bliss Version Switcher 1.2.1
 Author : Jonathan Vasquez (fearedbliss) <jvasquez1011@gmail.com>
-License: MPL 2.0
-Date   : Friday, January 16, 2015
+License: Simplified BSD License
+Date   : Saturday, February 14, 2015
 ------------------------------------------------
 
 Description:
@@ -19,11 +19,11 @@ Structure:
 ---------------
 The directory structure that BVS uses is as follows:
 
-Diablo II/				            - (Your Diablo II directory)
-Diablo II/Classic			        - All your classic versions will be in here
-Diablo II/Classic/<version>		    - Location of your Diablo II files for this version.
-Diablo II/Classic/<version>/data	- Data folder (If you have one)
-Diablo II/Classic/<version>/save	- Location of your save file for this specific version of classic
+Diablo II/                          - (Your Diablo II directory)
+Diablo II/Classic                   - All your classic versions will be in here
+Diablo II/Classic/<version>         - Location of your Diablo II files for this version.
+Diablo II/Classic/<version>/data    - Data folder (If you have one)
+Diablo II/Classic/<version>/save    - Location of your save file for this specific version of classic
 
 The same applies for expansion:
 
@@ -37,11 +37,11 @@ Instructions:
 1) Install Diablo II in <PATH> (Your choice)
 -) If you downloaded one of the bundles, put the 'Classic' and/or 'Expansion' folder that comes in the bundle into your D2's root directory.
 2) Open up BVS and click "Add". Fill in the details. (If you are using Windows Vista or higher, check the UAC instructions in the next section)
-	> Version will be what is _currently_ in the Diablo II directory (If freshly installed, it's either 1.00 for Classic, 1.07 for Expansion, or 1.12a Expansion for Blizzard's installer)
-	> Path will be the path to the Game.exe or Diablo II.exe
-	> Flags will be the options that you want to pass to Diablo II
+    > Version will be what is _currently_ in the Diablo II directory (If freshly installed, it's either 1.00 for Classic, 1.07 for Expansion, or 1.12a Expansion for Blizzard's installer)
+    > Path will be the path to the Game.exe or Diablo II.exe
+    > Flags will be the options that you want to pass to Diablo II
 3) Once you have added the entry, and you know that you have your "Play Disc" or "Expansion Disc" in your computer, Run the game once by pressing "Launch".
-   
+
 The first time you launch the application, the application will detect the version and type (classic|expansion) and it will create the directories
 needed inside your Diablo II directory. It will also backup the files for this version (If not already backed up) so that you can switch back to them, and it will also
 edit the registry and modify the location of your save/ characters and also the default resolution to use (640x480 for Classic, 800x600 for Expansion).
@@ -57,7 +57,7 @@ To disable UAC, Press [Windows Key + R] and type "msconfig", then go to Tools ->
 Then restart your computer. Now you can launch BlissVersionSwitcher.jar as usual and you are good to go.
 
 2. Use the BlissVersionSwitcher_UAC.bat script to get the appropriate permissions
-Launch the BlissVersionSwitcher_UAC.bat script which will ask you for administrative privileges, Windows will then give 
+Launch the BlissVersionSwitcher_UAC.bat script which will ask you for administrative privileges, Windows will then give
 Bliss Version Switcher correct permissions. After this, BIS (and in turn Diablo II.exe and Game.exe) will have the permissions
 necessary to launch.
 
