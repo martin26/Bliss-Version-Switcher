@@ -1,3 +1,15 @@
+1.3.0
+--------------
+- Added new installation instructions to help users have a successful initial setup.
+- Fixed bug where pressing the X button on one of the windows would not re-enable its button.
+- Window is no longer resizable
+- The header inside the list box can no longer be re-ordered or resized.
+- Added a small gap between buttons
+- Moved more complicated (in detail) instructions to "README_DETAILED.txt"
+- Minor main window UI improvements
+- Made the commons io jar be a relative import rather than explicit
+- Relicensed back to the Mozilla Public License 2.0
+
 1.2.1
 --------------
 - Relicensed to Simplified BSD License

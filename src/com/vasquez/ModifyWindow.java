@@ -1,11 +1,15 @@
 /*
  * Copyright 2013-2015 Jonathan Vasquez <jvasquez1011@gmail.com>
- * Licensed under the Simplified BSD License which can be found in the LICENSE file.
+ * 
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
 package com.vasquez;
 
 import java.awt.BorderLayout;
+import java.awt.Dialog;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,24 +21,25 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
-public class ModifyWindow extends JFrame {
-    public ModifyWindow(EntryWithModel tableManager, JTable entryTable, int selectedEntry, JButton mainModifyButton) {
-        super("Modify Entry");
+public class ModifyWindow extends JDialog {
+    public ModifyWindow(JFrame mainWindow, EntryWithModel tableManager, JTable entryTable, int selectedEntry) {
+        super(mainWindow, "Modify Entry", Dialog.ModalityType.DOCUMENT_MODAL);
 
         // Set window properties
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setResizable(false);
 
         // Bring in the table manager and entry table resources
         this.tableManager = tableManager;
         this.entryTable = entryTable;
         this.selectedEntry = selectedEntry;
-        this.mainModifyButton = mainModifyButton;
 
         // Create components and listeners
         JButton modify = new JButton("Modify");
@@ -73,7 +78,7 @@ public class ModifyWindow extends JFrame {
 
         // Create the layout and add the components to their respective places
         JPanel centerPanel = new JPanel(new GridLayout(3,2));
-        JPanel southPanel = new JPanel(new GridLayout(1,2));
+        JPanel southPanel = new JPanel(new GridLayout(1,2,3,3));
 
         southPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
         centerPanel.setBorder(BorderFactory.createEmptyBorder(10,10,0,10));
@@ -102,14 +107,12 @@ public class ModifyWindow extends JFrame {
 
             entryTable.repaint();
             dispose();
-            mainModifyButton.setEnabled(true);
         }
     }
 
     private class cancelListener implements ActionListener {
         public void actionPerformed(ActionEvent ev) {
             dispose();
-            mainModifyButton.setEnabled(true);
         }
     }
 
@@ -172,7 +175,6 @@ public class ModifyWindow extends JFrame {
     private JTextField path;
     private JTextField flags;
     private JCheckBox expansion;
-    private JButton mainModifyButton;
     private int selectedEntry;
     private int versionIndex;
 }

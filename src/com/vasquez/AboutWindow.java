@@ -1,27 +1,34 @@
 /*
  * Copyright 2013-2015 Jonathan Vasquez <jvasquez1011@gmail.com>
- * Licensed under the Simplified BSD License which can be found in the LICENSE file.
+ * 
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
 package com.vasquez;
 
 import java.awt.BorderLayout;
+import java.awt.Dialog;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class AboutWindow extends JFrame {
-    public AboutWindow(String name, String version, String releaseDate, String author, String contact, String license, JButton about) {
-        super("About");
+public class AboutWindow extends JDialog {
+    public AboutWindow(JFrame mainWindow, String name, String version, String releaseDate, String author, String contact, String license) {
+        super(mainWindow, "About", Dialog.ModalityType.DOCUMENT_MODAL);
 
         // Set window properties
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setResizable(false);
 
         // Bring in the table manager and entry table resources
         this.name = name;
@@ -30,7 +37,6 @@ public class AboutWindow extends JFrame {
         this.author = author;
         this.contact = contact;
         this.license = license;
-        this.about = about;
 
         // Create components and listeners
         JButton close = new JButton("Close");
@@ -80,7 +86,6 @@ public class AboutWindow extends JFrame {
     private class CloseListener implements ActionListener {
         public void actionPerformed(ActionEvent ev) {
             dispose();
-            about.setEnabled(true);
         }
     }
 
@@ -90,5 +95,4 @@ public class AboutWindow extends JFrame {
     private String author;
     private String contact;
     private String license;
-    private JButton about;
 }

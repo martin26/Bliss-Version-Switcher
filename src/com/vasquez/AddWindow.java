@@ -1,11 +1,15 @@
 /*
  * Copyright 2013-2015 Jonathan Vasquez <jvasquez1011@gmail.com>
- * Licensed under the Simplified BSD License which can be found in the LICENSE file.
+ * 
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
 package com.vasquez;
 
 import java.awt.BorderLayout;
+import java.awt.Dialog;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,23 +21,24 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
-public class AddWindow extends JFrame {
-    public AddWindow(EntryWithModel tableManager, JTable entryTable, JButton mainAddButton) {
-        super("Add Entry");
+public class AddWindow extends JDialog {
+    public AddWindow(JFrame mainWindow, EntryWithModel tableManager, JTable entryTable) {
+        super(mainWindow, "Add Entry", Dialog.ModalityType.DOCUMENT_MODAL);
 
         // Set window properties
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
+        setResizable(false);
+        
         // Bring in the table manager and entry table resources
         this.tableManager = tableManager;
         this.entryTable = entryTable;
-        this.mainAddButton = mainAddButton;
 
         // Create components and listeners
         JButton add = new JButton("Add");
@@ -89,17 +94,15 @@ public class AddWindow extends JFrame {
 
             entryTable.repaint();
             dispose();
-            mainAddButton.setEnabled(true);
         }
     }
 
     private class cancelListener implements ActionListener {
         public void actionPerformed(ActionEvent ev) {
-            dispose();
-            mainAddButton.setEnabled(true);
+        	dispose();
         }
     }
-
+    
     private class ExpansionListener implements ItemListener {
         public void itemStateChanged(ItemEvent arg0) {
             DefaultComboBoxModel d = null;
@@ -121,5 +124,4 @@ public class AddWindow extends JFrame {
     private JTextField path;
     private JTextField flags;
     private JCheckBox expansion;
-    private JButton mainAddButton;
 }

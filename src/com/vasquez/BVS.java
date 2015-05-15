@@ -1,6 +1,9 @@
 /*
  * Copyright 2013-2015 Jonathan Vasquez <jvasquez1011@gmail.com>
- * Licensed under the Simplified BSD License which can be found in the LICENSE file.
+ * 
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
 package com.vasquez;
@@ -13,6 +16,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -39,18 +43,19 @@ public class BVS {
         // Create Frame
         mainFrame = new JFrame(name + " " + version);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mainFrame.setSize(490,285);
+        mainFrame.setSize(480,277);
         mainFrame.setLocationRelativeTo(null); // Center the application
+        mainFrame.setResizable(false);
 
         // Create File Switcher
         fs = new FileSwitcher();
 
         // Buttons on South
-        add = new JButton("Add");
+        JButton add = new JButton("Add");
         JButton delete = new JButton("Delete");
-        modify = new JButton("Modify");
+        JButton modify = new JButton("Modify");
         JButton launch = new JButton("Launch");
-        about = new JButton("About");
+        JButton about = new JButton("About");
         JButton copy = new JButton("Copy");
         JButton shiftDown = new JButton("Shift Down");
         JButton shiftUp = new JButton("Shift Up");
@@ -66,7 +71,7 @@ public class BVS {
         shiftUp.addActionListener(new ShiftUpListener());
 
         // Create South Panel
-        GridLayout buttonGrid = new GridLayout(2,3);
+        GridLayout buttonGrid = new GridLayout(2,4,3,3);
         southPanel = new JPanel(buttonGrid);
 
         southPanel.setBorder(BorderFactory.createEmptyBorder(0,5,5,5));
@@ -97,7 +102,9 @@ public class BVS {
         entryTable.setFillsViewportHeight(true);
         entryTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         entryTable.setPreferredScrollableViewportSize(new Dimension(450,180));
-
+        entryTable.getTableHeader().setReorderingAllowed(false);
+        entryTable.getTableHeader().setResizingAllowed(false);
+        
         // Sets the width of each column
 
         // Path
@@ -172,11 +179,8 @@ public class BVS {
     }
 
     private void showAddWindow() {
-        JFrame addWindow = new AddWindow(tableManager, entryTable, add);
-
-        // Disable the Add Button
-        add.setEnabled(false);
-
+        JDialog addWindow = new AddWindow(mainFrame, tableManager, entryTable);
+        
         addWindow.setLocation(mainFrame.getLocation());
         addWindow.setSize(400,175);
         addWindow.setVisible(true);
@@ -184,10 +188,7 @@ public class BVS {
 
     public void showModifyWindow() {
         if(entryTable.getSelectedRow() != -1) {
-            JFrame modifyWindow = new ModifyWindow(tableManager, entryTable, entryTable.getSelectedRow(), modify);
-
-            // Disable the Modify Button
-            modify.setEnabled(false);
+            JDialog modifyWindow = new ModifyWindow(mainFrame, tableManager, entryTable, entryTable.getSelectedRow());
 
             modifyWindow.setLocation(mainFrame.getLocation());
             modifyWindow.setSize(400,175);
@@ -196,10 +197,7 @@ public class BVS {
     }
 
     private void showAboutWindow() {
-        JFrame aboutWindow = new AboutWindow(name, version, releaseDate, author, contact, license, about);
-
-        // Disable the About Button
-        about.setEnabled(false);
+        JDialog aboutWindow = new AboutWindow(mainFrame, name, version, releaseDate, author, contact, license);
 
         aboutWindow.setLocation(mainFrame.getLocation());
         aboutWindow.setSize(400,225);
@@ -241,19 +239,14 @@ public class BVS {
     private JTable entryTable;
     private EntryWithModel tableManager;
 
-    // Buttons (Making these available to all class methods so that I can enable/disable them)
-    private JButton add;
-    private JButton modify;
-    private JButton about;
-
     // File Switcher
     private FileSwitcher fs;
 
     // Program Information
     private String name = "Bliss Version Switcher";
-    private String version = "1.2.1";
-    private String releaseDate = "Saturday, February 14, 2015";
+    private String version = "1.3.0";
+    private String releaseDate = "Thursday, May 14, 2015";
     private String author = "Jonathan Vasquez";
     private String contact = "JVasquez1011@Gmail.com";
-    private String license = "Simplified BSD License";
+    private String license = "Mozilla Public License 2.0";
 }
