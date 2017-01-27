@@ -1,9 +1,18 @@
 /*
- * Copyright 2013-2015 Jonathan Vasquez <jvasquez1011@gmail.com>
+ * Copyright 2013-2017 Jonathan Vasquez <jon@xyinn.org>
  * 
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.vasquez;
@@ -244,9 +253,9 @@ public class BVS {
 
     // Program Information
     private String name = "Bliss Version Switcher";
-    private String version = "1.3.0";
-    private String releaseDate = "Thursday, May 14, 2015";
+    private String version = "1.3.1";
+    private String releaseDate = "Thursday, January 26, 2017";
     private String author = "Jonathan Vasquez";
-    private String contact = "JVasquez1011@Gmail.com";
-    private String license = "Mozilla Public License 2.0";
+    private String contact = "jon@xyinn.org";
+    private String license = "GPL v3.0";
 }

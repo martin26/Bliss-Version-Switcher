@@ -1,7 +1,7 @@
-Name   : Bliss Version Switcher 1.3.0
-Author : Jonathan Vasquez (fearedbliss) <jvasquez1011@gmail.com>
-License: Mozilla Public License 2.0
-Date   : Thursday, May 14, 2015
+Name   : Bliss Version Switcher 1.3.1
+Author : Jonathan Vasquez (fearedbliss) <jon@xyinn.org>
+License: GNU General Public License 3.0
+Date   : Thursday, January 26, 2017
 ------------------------------------------------
 
 Description:
