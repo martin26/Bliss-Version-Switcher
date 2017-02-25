@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.vasquez.utils;
+package com.vasquez.Utilities;
 
 public class Logger {
     @SuppressWarnings("unused")

@@ -17,11 +17,10 @@
 
 package com.vasquez;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import com.vasquez.Utilities.RegistryUtility;
+import com.vasquez.Utilities.Logger;
+
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,29 +28,86 @@ import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
 
-import com.vasquez.utils.Logger;
-import com.vasquez.utils.ProcessManager;
-import com.vasquez.utils.RegistryUtility;
-
 import static java.nio.file.StandardCopyOption.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 // Switches the files to the correct version of Diablo II
-
 public class FileSwitcher {
-    public FileSwitcher() {
-        lastRanVersion = null;
-        lastRanVersionFile = "LastRanVersion.txt";
+    private Entry _selectedEntry;
+    private Entry _lastRanEntry;
+    private EntryWithModel _tableManager;    
+    private ProcessManager processManager;
+    
+    private File game;
+    private File root;
+
+    private enum GameType {
+        Classic,
+        Expansion
+    }
+
+    private String[] thirdPartyLibraries = {
+         "binkw32.dll",
+         "ijl11.dll",
+         "SmackW32.dll"
+    };
+    
+
+    // Keeping separate from commonFiles since 1.07 doesn't have it.
+    private final String patchMpqFile = "Patch_D2.mpq";
+    
+    private String[] commonFiles = {
+        "Diablo II.exe",
+        "Game.exe",
+        "BNUpdate.exe"
+    };
+    
+    private final String[] requiredPre114Files = {
+            "Bnclient.dll",
+            "D2Client.dll",
+            "D2CMP.dll",
+            "D2Common.dll",
+            "D2DDraw.dll",
+            "D2Direct3D.dll",
+            "D2Game.dll",
+            "D2Gdi.dll",
+            "D2gfx.dll",
+            "D2Glide.dll",
+            "D2Lang.dll",
+            "D2Launch.dll",
+            "D2MCPClient.dll",
+            "D2Multi.dll",
+            "D2Net.dll",
+            "D2sound.dll",
+            "D2Win.dll",
+            "Fog.dll",
+            "Storm.dll",
+            "D2VidTst.exe"
+    };
+    
+    private final String[] requiredPost113Files = {
+        "BlizzardError.exe",
+        "SystemSurvey.exe"
+    };
+
+    private String[] expansionMPQs = {
+        "d2exp.mpq",
+        "d2xmusic.mpq",
+        "d2xvideo.mpq",
+        "d2xtalk.mpq"
+    };
+    
+    public FileSwitcher(EntryWithModel tableManager) {
+        _tableManager = tableManager;
+        _lastRanEntry = tableManager.getLastRanEntry();
         processManager = new ProcessManager();
     }
 
     // Sets the information about the entry you want to launch
     public void setEntry(Entry entry) {
-        version = entry.getVersion();
-        path = entry.getPath();
-        flags = entry.getSplitFlags();
-        expansion = entry.isExpansion();
-
-        game = new File(path);
+        _selectedEntry = entry;
+        game = new File(_selectedEntry.Path);
         root = new File(game.getParent());
     }
 
@@ -60,12 +116,12 @@ public class FileSwitcher {
     // 2. Replaying the version you played before
     // 3. Playing a different version than the last one you played
     public void launch() {
-        Logger.LogInfo("Launching Diablo II: " + getGameType() + " " + version);
+        Logger.LogInfo("Launching Diablo II: " + getGameType() + " " + _selectedEntry.Version);
 
         // This will only happen the first time the user runs the application
-        if(getLastVersion() == null) {
+        if(_lastRanEntry == null) {            
             // Set version to the current version the user has
-            setLastVersion(version, expansion);
+            markSelectedEntryAsLastRan();
 
             // Backs up the files since this is the first time you are running this application
             backupFiles();
@@ -76,7 +132,17 @@ public class FileSwitcher {
             // Launch the game
             runGame();
         }
-        else if(getLastVersion().equalsIgnoreCase(version.toString()) && lastRanType == expansion) {
+        else if(_lastRanEntry.Version.equalsIgnoreCase(_selectedEntry.Version) && _lastRanEntry.IsExpansion == _selectedEntry.IsExpansion) {
+            // If the versions are the same, we will be using the same folder,
+            // however, if you were to have multiple entries of the same version,
+            // with different flags, switching between those entries would not
+            // update the boolean. Let's fix that here.
+            if(_lastRanEntry.WasLastRan != _selectedEntry.WasLastRan) {
+                _selectedEntry.WasLastRan = true;
+                _lastRanEntry.WasLastRan = false;
+                _lastRanEntry = _selectedEntry;
+            }
+            
             // Delete the 'data' directory in the backup if the game doesn't have a 'data' directory in the root
             deleteDataDir(1);
 
@@ -101,7 +167,7 @@ public class FileSwitcher {
                 prepareRegistry();
 
                 // write the version for this run now
-                setLastVersion(version, expansion);
+                markSelectedEntryAsLastRan();
 
                 // Start the game
                 runGame();
@@ -114,7 +180,7 @@ public class FileSwitcher {
 
     // Update the "Save Path" and "Resolution" registry variables
     public void prepareRegistry() {
-        RegistryUtility ru = new RegistryUtility(root.getAbsolutePath(), version, expansion);
+        RegistryUtility ru = new RegistryUtility(root.getAbsolutePath(), _selectedEntry.Version, _selectedEntry.IsExpansion);
         ru.update();
     }
 
@@ -123,15 +189,16 @@ public class FileSwitcher {
         File saveDir = null;
 
         // Sets the path depending if it's an expansion or classic entry
-        if(expansion) {
-            saveDir = new File(root.getAbsolutePath() + "\\Expansion\\" + version + "\\save\\");
+        if(_selectedEntry.IsExpansion) {
+            saveDir = new File(root.getAbsolutePath() + "\\Expansion\\" + _selectedEntry.Version + "\\save\\");
         }
         else {
-            saveDir = new File(root.getAbsolutePath() + "\\Classic\\" + version + "\\save\\");
+            saveDir = new File(root.getAbsolutePath() + "\\Classic\\" + _selectedEntry.Version + "\\save\\");
         }
 
-        // If we are going to be creating the backup directory, might as well use the 'save' directory as the top most
-        // folder since we are going to need to create this directory anyways
+        // If we are going to be creating the backup directory, might as well
+        // use the 'save' directory as the top most folder since we are going
+        // to need to create this directory anyways.
         if(!saveDir.exists()) {
             saveDir.mkdirs();
         }
@@ -145,47 +212,76 @@ public class FileSwitcher {
 
     // Backup the files that are in this current directory
     private void backupFiles() {
-        Logger.LogInfo("Backing up important Diablo II files...");
+        Logger.LogInfo("Backing up files for last ran entry: " + _lastRanEntry.Version + " ...");
 
         // Makes sure that the backup directories exist
         prepareBackupDir();
 
-        for(String file: requiredFiles) {
+        for(String file: getRequiredFiles(_lastRanEntry)) {
             File sourceFile = new File(root.getAbsolutePath() + "\\" + file);
             File targetFile = null;
 
             // Sets the path depending if it's an expansion or classic entry
-            if(expansion) {
-                targetFile = new File(root.getAbsolutePath() + "\\Expansion\\" + version + "\\" + file);
+            if(_selectedEntry.IsExpansion) {
+                targetFile = new File(root.getAbsolutePath() + "\\Expansion\\" + _selectedEntry.Version + "\\" + file);
             }
             else {
-                targetFile = new File(root.getAbsolutePath() + "\\Classic\\" + version + "\\" + file);
+                targetFile = new File(root.getAbsolutePath() + "\\Classic\\" + _selectedEntry.Version + "\\" + file);
             }
 
             // Backup the files if they aren't already backed up
             if(sourceFile.exists() && !targetFile.exists()) {
                 backupFilesHandler(sourceFile, targetFile);
             }
+            
+            // Delete the files for these backed up ones so that the next
+            // version has a clean slate.
+            sourceFile.delete();
         }
 
         // Backs up the data folder if it exists
         doDataDir(0);
     }
 
+    private ArrayList<String> getRequiredFiles(Entry entry)
+    {       
+        ArrayList<String> requiredFiles = new ArrayList<>();
+        
+        requiredFiles.addAll(Arrays.asList(commonFiles));
+        requiredFiles.addAll(Arrays.asList(thirdPartyLibraries));
+        
+        if (entry.Version.equalsIgnoreCase("1.14d"))
+        {
+            requiredFiles.addAll(Arrays.asList(requiredPost113Files));
+            requiredFiles.add(patchMpqFile);
+        }
+        else {
+            // Every other version is the same (1.00-1.13),
+            // just 1.00 and 1.07 don't have a Patch_D2.mpq.
+            requiredFiles.addAll(Arrays.asList(requiredPre114Files));
+            
+            if (!entry.Version.equalsIgnoreCase("1.00") && !entry.Version.equalsIgnoreCase("1.07")) {
+                requiredFiles.add(patchMpqFile);
+            }
+        }
+        
+       return requiredFiles;
+    }
+    
     // Restore the files for the version you want to play
     private void restoreFiles() {
-        Logger.LogInfo("Restoring important Diablo II files...");
+        Logger.LogInfo("Restoring important files for new run: " + _selectedEntry.Version + " ...");
 
-        for(String file: requiredFiles) {
+        for(String file: getRequiredFiles(_selectedEntry)) {
             File sourceFile = null;
             File targetFile = new File(root.getAbsolutePath() + "\\" + file);
 
             // Sets the path depending if it's an expansion or classic entry
-            if(expansion) {
-                sourceFile = new File(root.getAbsolutePath() + "\\Expansion\\" + version + "\\" + file);
+            if(_selectedEntry.IsExpansion) {
+                sourceFile = new File(root.getAbsolutePath() + "\\Expansion\\" + _selectedEntry.Version + "\\" + file);
             }
             else {
-                sourceFile = new File(root.getAbsolutePath() + "\\Classic\\" + version + "\\" + file);
+                sourceFile = new File(root.getAbsolutePath() + "\\Classic\\" + _selectedEntry.Version + "\\" + file);
             }
 
             Path sourceDll = Paths.get(sourceFile.getAbsolutePath());
@@ -205,7 +301,7 @@ public class FileSwitcher {
         doDataDir(1);
 
         // Switch the Expansion MPQs to different locations depending if expansion/classic
-        if(expansion) {
+        if(_selectedEntry.IsExpansion) {
             switchTo(GameType.Expansion);
         }
         else {
@@ -220,11 +316,11 @@ public class FileSwitcher {
         // Check to see if the version is 1.00/1.07 and if it is then don't copy some files
         try {
             // Expansion
-            if(expansion) {
-                if(version.equalsIgnoreCase("1.07") && !source.getName().equalsIgnoreCase("Patch_D2.mpq")) {
+            if(_selectedEntry.IsExpansion) {
+                if(_selectedEntry.Version.equalsIgnoreCase("1.07") && !source.getName().equalsIgnoreCase("Patch_D2.mpq")) {
                     Files.copy(sourceDll, destDll, REPLACE_EXISTING);
                 }
-                else if(version.equalsIgnoreCase("1.07") && source.getName().equalsIgnoreCase("Patch_D2.mpq")){
+                else if(_selectedEntry.Version.equalsIgnoreCase("1.07") && source.getName().equalsIgnoreCase("Patch_D2.mpq")){
                     source.delete();
                 }
                 else {
@@ -234,11 +330,11 @@ public class FileSwitcher {
             }
             else {
                 // Classic
-                if(version.equalsIgnoreCase("1.00") && (!source.getName().equalsIgnoreCase("Patch_D2.mpq")
+                if(_selectedEntry.Version.equalsIgnoreCase("1.00") && (!source.getName().equalsIgnoreCase("Patch_D2.mpq")
                                                     && !source.getName().equalsIgnoreCase("BNUpdate.exe"))) {
                     Files.copy(sourceDll, destDll, REPLACE_EXISTING);
                 }
-                else if(version.equalsIgnoreCase("1.00") && (source.getName().equalsIgnoreCase("Patch_D2.mpq")
+                else if(_selectedEntry.Version.equalsIgnoreCase("1.00") && (source.getName().equalsIgnoreCase("Patch_D2.mpq")
                                                          || source.getName().equalsIgnoreCase("BNUpdate.exe"))){
                     source.delete();
                 }
@@ -265,11 +361,11 @@ public class FileSwitcher {
 
             sourceFile = new File(root.getAbsolutePath() + "\\data\\");
 
-            if(expansion) {
-                targetFile = new File(root.getAbsolutePath() + "\\Expansion\\" + version + "\\data\\");
+            if(_selectedEntry.IsExpansion) {
+                targetFile = new File(root.getAbsolutePath() + "\\Expansion\\" + _selectedEntry.Version + "\\data\\");
             }
             else {
-                targetFile = new File(root.getAbsolutePath() + "\\Classic\\" + version + "\\data\\");
+                targetFile = new File(root.getAbsolutePath() + "\\Classic\\" + _selectedEntry.Version + "\\data\\");
             }
         }
         else {
@@ -277,11 +373,11 @@ public class FileSwitcher {
 
             targetFile = new File(root.getAbsolutePath() + "\\data\\");
 
-            if(expansion) {
-                sourceFile = new File(root.getAbsolutePath() + "\\Expansion\\" + version + "\\data\\");
+            if(_selectedEntry.IsExpansion) {
+                sourceFile = new File(root.getAbsolutePath() + "\\Expansion\\" + _selectedEntry.Version + "\\data\\");
             }
             else {
-                sourceFile = new File(root.getAbsolutePath() + "\\Classic\\" + version + "\\data\\");
+                sourceFile = new File(root.getAbsolutePath() + "\\Classic\\" + _selectedEntry.Version + "\\data\\");
             }
         }
 
@@ -327,11 +423,11 @@ public class FileSwitcher {
             else if(option == 1 && !sourceFile.exists()) {
                 File backupFile = null;
 
-                if(expansion) {
-                    backupFile = new File(root.getAbsolutePath() + "\\Expansion\\" + version + "\\data\\");
+                if(_selectedEntry.IsExpansion) {
+                    backupFile = new File(root.getAbsolutePath() + "\\Expansion\\" + _selectedEntry.Version + "\\data\\");
                 }
                 else {
-                    backupFile = new File(root.getAbsolutePath() + "\\Classic\\" + version + "\\data\\");
+                    backupFile = new File(root.getAbsolutePath() + "\\Classic\\" + _selectedEntry.Version + "\\data\\");
                 }
 
                 if(backupFile.exists() && backupFile.isDirectory()) {
@@ -390,55 +486,23 @@ public class FileSwitcher {
         }
     }
 
-    private void setLastVersion(String version, boolean expansion) {
-        try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(lastRanVersionFile));
-            bw.write(version + ";" + expansion + "\r\n");
-            bw.close();
+    private void markSelectedEntryAsLastRan() { 
+        if(_lastRanEntry != null) {
+            _lastRanEntry.WasLastRan = false;
         }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private String getLastVersion() {
-        String line = null;
-
-        try {
-            File lrv = new File(lastRanVersionFile);
-
-            if(lrv.exists()) {
-                BufferedReader br = new BufferedReader(new FileReader(lastRanVersionFile));
-
-                while((line = br.readLine()) != null) {
-                    String[] result = line.split(";");
-                    lastRanVersion = result[0];
-                    lastRanType = Boolean.parseBoolean(result[1]);
-                }
-
-                br.close();
-            }
-            else {
-                lrv.createNewFile();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return lastRanVersion;
+        _selectedEntry.WasLastRan = true;
+        _lastRanEntry = _selectedEntry;
+        
+        _tableManager.saveData();
     }
 
     private String getGameType() {
-        if (expansion) {
-            return "Expansion";
-        }
-
-        return "Classic";
+        return _selectedEntry.IsExpansion ? "Expansion" : "Classic";
     }
 
     public class LauncherRunnable implements Runnable {
         public void run() {
-            int result = processManager.startProcess(path, flags);
+            int result = processManager.startProcess(_selectedEntry.Path, _selectedEntry.getSplitFlags());
 
             if (result == -1) {
                 Logger.LogError("There was an error managing the Diablo II process.");
@@ -452,58 +516,4 @@ public class FileSwitcher {
             }
         }
     }
-
-    private String version;
-    private String path;
-    private String[] flags;
-    private boolean expansion;
-    private String lastRanVersion;
-    private String lastRanVersionFile;
-    private boolean lastRanType;
-    private ProcessManager processManager;
-
-    private File game;
-    private File root;
-
-    private enum GameType {
-        Classic,
-        Expansion
-    }
-
-    private String[] requiredFiles = {
-            "binkw32.dll",
-            "Bnclient.dll",
-            "D2Client.dll",
-            "D2CMP.dll",
-            "D2Common.dll",
-            "D2DDraw.dll",
-            "D2Direct3D.dll",
-            "D2Game.dll",
-            "D2Gdi.dll",
-            "D2gfx.dll",
-            "D2Glide.dll",
-            "D2Lang.dll",
-            "D2Launch.dll",
-            "D2MCPClient.dll",
-            "D2Multi.dll",
-            "D2Net.dll",
-            "D2sound.dll",
-            "D2Win.dll",
-            "Fog.dll",
-            "ijl11.dll",
-            "SmackW32.dll",
-            "Storm.dll",
-            "Patch_D2.mpq",
-            "Diablo II.exe",
-            "Game.exe",
-            "BNUpdate.exe",
-            "D2VidTst.exe"
-    };
-
-    private String[] expansionMPQs = {
-        "d2exp.mpq",
-        "d2xmusic.mpq",
-        "d2xvideo.mpq",
-        "d2xtalk.mpq"
-    };
 }

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.vasquez.utils;
+package com.vasquez;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,7 +33,6 @@ public class ProcessManager {
     // This prevents users from opening up multiple versions of Diablo II.
     // Only multiple instances of the same version of Diablo II are allowed.
     public int startProcess(String path, String[] flags) {
-        String finalCommand = "";
         ArrayList<String> command = new ArrayList<String>();
         command.add(path);
 
@@ -50,25 +49,15 @@ public class ProcessManager {
             command.add(flag);
         }
 
-        // Build Command String
-        for (Iterator<String> i = command.iterator(); i.hasNext();) {
-            String value = i.next();
-
-            if (finalCommand.isEmpty()) {
-                finalCommand = value;
-            }
-            else {
-                finalCommand = finalCommand + " " + value;
-            }
-        }
-
+        String [] commandShot = command.toArray(new String[command.size()]);
+        
         Runtime runtime = Runtime.getRuntime();
 
         // Launch the process and add one to the counter
         try {
-            Process process = runtime.exec(finalCommand);
+            Process process = runtime.exec(commandShot);
             addProcessCount();
-
+            
             // Wait for the process to finish.
             int exitResult = process.waitFor();
 

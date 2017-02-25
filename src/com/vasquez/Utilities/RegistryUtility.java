@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.vasquez.utils;
+package com.vasquez.Utilities;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -47,12 +47,11 @@ public class RegistryUtility {
             // Sets the path depending if it's an expansion or classic entry
             if(expansion) {
                 bw.write("\"Save Path\"=\"" + getSavePath() + "Expansion\\\\" + version + "\\\\save\\\\\"\r\n");
-
-                // Set the resolution to 800x600 (For convenience, not a necessity)
-                bw.write("\"Resolution\"=dword:00000001\r\n");
+                bw.write("\"NewSavePath\"=\"" + getSavePath() + "Expansion\\\\" + version + "\\\\save\\\\\"\r\n");
             }
             else {
                 bw.write("\"Save Path\"=\"" + getSavePath() + "Classic\\\\" + version + "\\\\save\\\\\"\r\n");
+                bw.write("\"NewSavePath\"=\"" + getSavePath() + "Classic\\\\" + version + "\\\\save\\\\\"\r\n");
 
                 // Make sure the resolution is 640x480 or the game will crash when you try to load your character
                 bw.write("\"Resolution\"=dword:00000000\r\n");

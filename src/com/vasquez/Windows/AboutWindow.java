@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.vasquez;
+package com.vasquez.Windows;
 
 import java.awt.BorderLayout;
 import java.awt.Dialog;

@@ -17,34 +17,47 @@
 
 package com.vasquez;
 
-import java.io.BufferedReader;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import org.apache.commons.io.FileUtils;
+
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
-import com.vasquez.utils.Logger;
-
 public class EntryWithModel {
+    private String entriesFile;
+    private ArrayList<Entry> list;
+    private String[] columnNames = {"Version", "Exp", "Last", "Path to \"Game.exe\"", "Flags"};
+    private EntryModel peModel;
+    
     public EntryWithModel() {
-        entriesFile = "Entries.txt";
-
-        list = new ArrayList<Entry>();
-        loadData();
+        entriesFile = "Entries.json";
+        list = loadData();
         peModel = new EntryModel();
     }
 
+    public Entry getLastRanEntry() {
+        for(Entry e: list) {
+            if ( e.WasLastRan) {
+                return e;
+            } 
+        }
+        return null;
+    }
+    
     public int addEntry(String version, String path, String flags, boolean expansion) {
         return peModel.addEntry(version, path, flags, expansion);
     }
 
     public int modifyEntry(String version, String path, String flags, boolean expansion, int e) {
         peModel.modifyEntry(version, path, flags, expansion, e);
-
         return e;
     }
 
@@ -55,17 +68,9 @@ public class EntryWithModel {
     public Entry getEntry(int i) {
         return list.get(i);
     }
-
+    
     public int copyEntry(int e) {
         return peModel.copyEntry(e);
-    }
-
-    public int shiftUp(int e) {
-        return peModel.shiftUp(e);
-    }
-
-    public int shiftDown(int e) {
-        return peModel.shiftDown(e);
     }
 
     public Object getValueAt(int row, int col) {
@@ -88,90 +93,50 @@ public class EntryWithModel {
         return peModel.isSelectedExpansion(row);
     }
 
-    public void printList() {
-        Logger.LogInfo("Version\tPath\tFlags");
-
-        for(Entry e: list) {
-            Logger.LogInfo(e.getVersion() + "\t" + e.getPath() + "\t" + e.getFlags());
-        }
-    }
-
     public int getSize() {
         return list.size();
     }
 
-    // Gets a multi-dimensional representation of the ArrayList
-    public Object[][] getData() {
-        Object[][] data = new Object[list.size()][];
-
-        for(int i = 0; i < list.size(); i++) {
-            data[i] = list.get(i).toObjectArray();
+    public void saveData() {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(entriesFile))) {
+            bw.write(new GsonBuilder().setPrettyPrinting().create().toJson(list));
         }
-
-        return data;
+        catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public int saveData() {
+    public ArrayList<Entry> loadData() {
+        ArrayList<Entry> stagedEntries = new ArrayList<>();
+        
         try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(entriesFile));
+            File entryFile = new File(entriesFile);
 
-            // Ending the entry with a '0' so that if the path is null, it would just assign it a null value and proceed to the 0.
-            // aka, using the same technique Blizzard uses in their data/global/excel entries to terminate data lines
-            for(Entry entry: list) {
-                bw.write(entry.getVersion() + ";" + entry.isExpansion() + ";" + entry.getPath() + ";" + entry.getFlags() + ";0;\r\n");
+            if(entryFile.exists()) 
+            {
+                String fileContents = FileUtils.readFileToString(entryFile, "UTF-8");
+                ArrayList<Entry> potentialEntryList = new Gson().fromJson(fileContents, new TypeToken<ArrayList<Entry>>(){}.getType());
+                return potentialEntryList != null ? potentialEntryList : stagedEntries;
             }
-
-            bw.close();
+            
+            JOptionPane.showMessageDialog(null,
+            		"Welcome to Bliss Version Switcher. \n\nPlease add an entry for your Game.exe and make sure that it is the\n" +
+            		"same version as what's in that folder, and then click Launch.\n" +
+            		"Picking a different version than what's in the folder will cause problems.\n\n" +
+            		"For example, if my Diablo II folder is at D:\\Games\\Diablo II\\Game.exe\n" +
+            		"and that folder is at 1.13d, and I'm playing expansion, with window\n" +
+            		"mode and no sound, my initial entry for the switcher would look as follows:\n\n" +
+            		"Version: 1.13d\n" +
+            		"Path (Game.exe): D:\\Games\\Diablo II\\Game.exe\n" +
+            		"Flags: -w -ns\n" +
+            		"Expansion: Yes");
+            
+            entryFile.createNewFile();    
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return 0;
-    }
-
-    public int loadData() {
-        // Make sure we start off with a fresh list
-        list.clear();
-
-        try {
-
-            // Make sure that the Entries.txt file exists (Even if it is empty)
-            File ent = new File(entriesFile);
-
-            if(!ent.exists()) {
-                ent.createNewFile();
-            }
-
-            BufferedReader br = new BufferedReader(new FileReader(entriesFile));
-
-            String line = null;
-
-            while((line = br.readLine()) != null) {
-                String[] result = line.split(";");
-
-                try {
-                    list.add(new Entry(result[0], result[2], result[3], Boolean.parseBoolean(result[1])));
-                }
-                catch(Exception e) {
-                    Logger.LogWarning("Corrupted File. Recreating...");
-
-                    // Closing the buffer so that we can delete the file, then reopening it.
-                    br.close();
-
-                    if(ent.exists() && ent.delete()) {
-                        ent.createNewFile();
-                    }
-
-                    br = new BufferedReader(new FileReader(entriesFile));
-                }
-            }
-
-            br.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return 0;
+        
+        return stagedEntries;
     }
 
     public EntryModel getModel() {
@@ -201,13 +166,15 @@ public class EntryWithModel {
 
             switch(col) {
             case 0:
-                return e.getVersion();
+                return e.Version;
             case 1:
-                return e.isExpansion();
+                return e.IsExpansion;
             case 2:
-                return e.getPath();
+                return e.WasLastRan;
             case 3:
-                return e.getFlags();
+                return e.Path;
+            case 4:
+                return e.Flags;
             default:
                 return "error";
             }
@@ -219,23 +186,23 @@ public class EntryWithModel {
         }
 
         public String getSelectedVersion(int row) {
-            return list.get(row).getVersion();
+            return list.get(row).Version;
         }
 
         public String getSelectedPath(int row) {
-            return list.get(row).getPath();
+            return list.get(row).Path;
         }
 
         public String getSelectedFlags(int row) {
-            return list.get(row).getFlags();
+            return list.get(row).Flags;
         }
 
         public boolean isSelectedExpansion(int row) {
-            return list.get(row).isExpansion();
+            return list.get(row).IsExpansion;
         }
 
         public int addEntry(String version, String path, String flags, boolean expansion) {
-             list.add(new Entry(version, path, flags, expansion));
+             list.add(new Entry(version, path, flags, expansion, false));
 
              saveData();
              fireTableDataChanged();
@@ -246,10 +213,10 @@ public class EntryWithModel {
         public int modifyEntry(String version, String path, String flags, boolean expansion, int e) {
             Entry t = list.get(e);
 
-            t.setVersion(version);
-            t.setExpansion(expansion);
-            t.setPath(path);
-            t.setFlags(flags);
+            t.Version = version;
+            t.IsExpansion = expansion;
+            t.Path = path;
+            t.Flags = flags;
 
             saveData();
             fireTableDataChanged();
@@ -269,14 +236,14 @@ public class EntryWithModel {
             // Returns null if some error happened
             return -1;
         }
-
+        
         // Copies the entry that is passed to this method and then inserts it into the list
         public int copyEntry(int entry) {
             int next = entry + 1;
 
             if(entry != -1) {
                 Entry oldEntry = list.get(entry);
-                Entry newEntry = new Entry(oldEntry.getVersion(), oldEntry.getPath(), oldEntry.getFlags(), oldEntry.isExpansion());
+                Entry newEntry = new Entry(oldEntry.Version, oldEntry.Path, oldEntry.Flags, oldEntry.IsExpansion, false);
 
                 list.add(next, newEntry);
 
@@ -286,37 +253,5 @@ public class EntryWithModel {
                 return next;
             } else { return -1; }
         }
-
-        public int shiftUp(int entry) {
-            int previous = entry - 1;
-
-            if(previous >= 0) {
-                swap(entry, previous);
-                return previous;
-            } else { return -1; }
-        }
-
-        public int shiftDown(int entry) {
-            int next = entry + 1;
-
-            if(next < list.size()) {
-                swap(entry, next);
-                return next;
-            } else { return -1; }
-        }
-
-        // Swaps two values
-        private void swap(int source, int target) {
-            Entry temp = list.get(target);
-            list.set(target, list.get(source));
-            list.set(source, temp);
-            saveData();
-            fireTableDataChanged();
-        }
     }
-
-    private String entriesFile;
-    private ArrayList<Entry> list;
-    private String[] columnNames = {"Version", "Exp", "Path to \"Game.exe\"", "Flags"};
-    private EntryModel peModel;
 }

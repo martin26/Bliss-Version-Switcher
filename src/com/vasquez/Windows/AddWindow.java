@@ -15,8 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.vasquez;
+package com.vasquez.Windows;
 
+import com.vasquez.EntryWithModel;
+import com.vasquez.Listing;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.GridLayout;
@@ -24,6 +26,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -31,13 +34,22 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class AddWindow extends JDialog {
+    protected EntryWithModel tableManager;
+    protected JTable entryTable;
+    protected JComboBox version;
+    protected JTextField path;
+    protected JTextField flags;
+    protected JCheckBox expansion;
+    
     public AddWindow(JFrame mainWindow, EntryWithModel tableManager, JTable entryTable) {
         super(mainWindow, "Add Entry", Dialog.ModalityType.DOCUMENT_MODAL);
 
@@ -50,23 +62,26 @@ public class AddWindow extends JDialog {
         this.entryTable = entryTable;
 
         // Create components and listeners
+        JButton find = new JButton("Set Path");
         JButton add = new JButton("Add");
         JButton cancel = new JButton("Cancel");
 
-        add.addActionListener(new addListener());
+        find.addActionListener(new FindGameListener(this));
+        add.addActionListener(new addListener()); 
         cancel.addActionListener(new cancelListener());
 
         JLabel versionL = new JLabel("Version:");
-        JLabel pathL = new JLabel("Path:");
+        JLabel pathL = new JLabel("Path (Game.exe):");
         JLabel flagsL = new JLabel("Flags:");
 
         version = new JComboBox(Listing.classicVersions);
         path = new JTextField();
         flags = new JTextField();
         expansion = new JCheckBox("Expansion");
-
+    
+        path.setEditable(false);
+        
         expansion.addItemListener(new ExpansionListener());
-        version.setEditable(true);
         version.setSelectedIndex(0);
 
         // Create the layout and add the components to their respective places
@@ -80,6 +95,7 @@ public class AddWindow extends JDialog {
         getContentPane().add(BorderLayout.SOUTH, southPanel);
 
         southPanel.add(expansion);
+        southPanel.add(find);
         southPanel.add(add);
         southPanel.add(cancel);
 
@@ -90,7 +106,7 @@ public class AddWindow extends JDialog {
         centerPanel.add(flagsL);
         centerPanel.add(flags);
     }
-
+    
     private class addListener implements ActionListener {
         public void actionPerformed(ActionEvent ev) {
             // Used to set the row to the new value added to the list
@@ -112,6 +128,28 @@ public class AddWindow extends JDialog {
         }
     }
     
+     private class FindGameListener implements ActionListener {
+        private JDialog parentWindow;
+        
+        public FindGameListener(JDialog window) {
+            parentWindow = window;
+        }
+        
+        public void actionPerformed(ActionEvent ev) {
+            JFileChooser fc = new JFileChooser();
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("Select Game.exe Only", "exe");
+            fc.setFileFilter(filter);
+            fc.setCurrentDirectory(new File("C:\\"));
+            
+            int result = fc.showOpenDialog(parentWindow);
+            
+            if(result == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+                path.setText(file.getAbsolutePath());
+            }
+        }
+    }
+     
     private class ExpansionListener implements ItemListener {
         public void itemStateChanged(ItemEvent arg0) {
             DefaultComboBoxModel d = null;
@@ -126,11 +164,4 @@ public class AddWindow extends JDialog {
             }
         }
     }
-
-    private EntryWithModel tableManager;
-    private JTable entryTable;
-    private JComboBox version;
-    private JTextField path;
-    private JTextField flags;
-    private JCheckBox expansion;
 }

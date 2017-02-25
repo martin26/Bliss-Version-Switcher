@@ -1,3 +1,5 @@
-/bin
-Entries.txt
-LastRanVersion.txt
+bin/
+bin/*
+dist/*
+build/*
+Entries.json

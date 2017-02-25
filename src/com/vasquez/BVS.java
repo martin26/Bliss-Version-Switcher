@@ -17,6 +17,10 @@
 
 package com.vasquez;
 
+import com.vasquez.Windows.AboutWindow;
+import com.vasquez.Windows.AddWindow;
+import com.vasquez.Utilities.Logger;
+import com.vasquez.Windows.ModifyWindow;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -34,9 +38,25 @@ import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.table.TableColumn;
 
-import com.vasquez.utils.Logger;
-
 public class BVS {
+    // GUI Components
+    private JFrame mainFrame;
+    private JPanel southPanel;
+    private JPanel centerPanel;
+    private JTable entryTable;
+    private EntryWithModel tableManager;
+
+    // File Switcher
+    private FileSwitcher fs;
+
+    // Program Information
+    private final String name = "Bliss Version Switcher";
+    private final String version = "1.4.0";
+    private final String releaseDate = "February 25, 2017";
+    private final String author = "Jonathan Vasquez";
+    private final String contact = "jon@xyinn.org";
+    private final String license = "GPL v3.0";
+    
     public static void main(String[] args) {
         Logger.EnableLogging();
 
@@ -52,23 +72,18 @@ public class BVS {
         // Create Frame
         mainFrame = new JFrame(name + " " + version);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mainFrame.setSize(480,277);
+        mainFrame.setSize(500,250);
         mainFrame.setLocationRelativeTo(null); // Center the application
         mainFrame.setResizable(false);
-
-        // Create File Switcher
-        fs = new FileSwitcher();
 
         // Buttons on South
         JButton add = new JButton("Add");
         JButton delete = new JButton("Delete");
-        JButton modify = new JButton("Modify");
+        JButton modify = new JButton("Edit");
         JButton launch = new JButton("Launch");
         JButton about = new JButton("About");
         JButton copy = new JButton("Copy");
-        JButton shiftDown = new JButton("Shift Down");
-        JButton shiftUp = new JButton("Shift Up");
-
+        
         // Button Listeners
         add.addActionListener(new AddListener());
         delete.addActionListener(new DeleteListener());
@@ -76,22 +91,17 @@ public class BVS {
         launch.addActionListener(new LaunchListener());
         about.addActionListener(new AboutListener());
         copy.addActionListener(new CopyListener());
-        shiftDown.addActionListener(new ShiftDownListener());
-        shiftUp.addActionListener(new ShiftUpListener());
 
         // Create South Panel
-        GridLayout buttonGrid = new GridLayout(2,4,3,3);
+        GridLayout buttonGrid = new GridLayout(1,5,3,3);
         southPanel = new JPanel(buttonGrid);
-
         southPanel.setBorder(BorderFactory.createEmptyBorder(0,5,5,5));
         mainFrame.getContentPane().add(BorderLayout.SOUTH, southPanel);
 
         southPanel.add(add);
-        southPanel.add(delete);
         southPanel.add(modify);
         southPanel.add(copy);
-        southPanel.add(shiftUp);
-        southPanel.add(shiftDown);
+        southPanel.add(delete);
         southPanel.add(launch);
         southPanel.add(about);
 
@@ -104,8 +114,11 @@ public class BVS {
         tableManager = new EntryWithModel();
         entryTable = new JTable(tableManager.getModel());
 
+        // Create File Switcher
+        fs = new FileSwitcher(tableManager);
+        
         JScrollPane tableScroller = new JScrollPane(entryTable);
-        tableScroller.setPreferredSize(new Dimension(462,180));
+        tableScroller.setPreferredSize(new Dimension(480,180));
         tableScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         entryTable.setFillsViewportHeight(true);
@@ -116,19 +129,23 @@ public class BVS {
         
         // Sets the width of each column
 
-        // Path
+        // Last Ran
         TableColumn column = entryTable.getColumnModel().getColumn(2);
+        column.setPreferredWidth(75);
+        
+        // Path
+        column = entryTable.getColumnModel().getColumn(3);
         column.setPreferredWidth(600);
 
         // Flags
-        column = entryTable.getColumnModel().getColumn(3);
+        column = entryTable.getColumnModel().getColumn(4);
         column.setPreferredWidth(200);
 
         // Version
         column = entryTable.getColumnModel().getColumn(0);
         column.setPreferredWidth(100);
 
-        centerPanel.add(tableScroller);
+        centerPanel.add(tableScroller);        
 
         // Show the screen
         mainFrame.setVisible(true);
@@ -177,7 +194,7 @@ public class BVS {
             showAboutWindow();
         }
     }
-
+    
     private class CopyListener implements ActionListener {
         public void actionPerformed(ActionEvent ev) {
             if(entryTable.getSelectedRow() != -1) {
@@ -186,7 +203,7 @@ public class BVS {
             }
         }
     }
-
+    
     private void showAddWindow() {
         JDialog addWindow = new AddWindow(mainFrame, tableManager, entryTable);
         
@@ -212,50 +229,4 @@ public class BVS {
         aboutWindow.setSize(400,225);
         aboutWindow.setVisible(true);
     }
-
-    private class ShiftUpListener implements ActionListener {
-        public void actionPerformed(ActionEvent ev) {
-            if(entryTable.getSelectedRow() != -1) {
-                int result = tableManager.shiftUp(entryTable.getSelectedRow());
-
-                if(result != -1) {
-                    entryTable.setRowSelectionInterval(result, result);
-                } else {
-                    entryTable.setRowSelectionInterval(0, 0);
-                }
-            }
-        }
-    }
-
-    private class ShiftDownListener implements ActionListener {
-        public void actionPerformed(ActionEvent ev) {
-            if(entryTable.getSelectedRow() != -1) {
-                int result = tableManager.shiftDown(entryTable.getSelectedRow());
-
-                if(result != -1) {
-                    entryTable.setRowSelectionInterval(result, result);
-                } else {
-                    entryTable.setRowSelectionInterval(tableManager.getSize()-1, tableManager.getSize()-1);
-                }
-            }
-        }
-    }
-
-    // GUI Components
-    private JFrame mainFrame;
-    private JPanel southPanel;
-    private JPanel centerPanel;
-    private JTable entryTable;
-    private EntryWithModel tableManager;
-
-    // File Switcher
-    private FileSwitcher fs;
-
-    // Program Information
-    private String name = "Bliss Version Switcher";
-    private String version = "1.3.1";
-    private String releaseDate = "Thursday, January 26, 2017";
-    private String author = "Jonathan Vasquez";
-    private String contact = "jon@xyinn.org";
-    private String license = "GPL v3.0";
 }

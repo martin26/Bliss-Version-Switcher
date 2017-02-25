@@ -1,3 +1,34 @@
+1.4.0
+--------------
+- Removed my custom serialization and now using Google's JSON library.
+- Simplified the UI (Removed: Shift Up and Down)
+- Renamed "Modify" to "Edit"
+- Entries.txt renamed to Entries.json
+- LastRanVersion.txt is no longer used. "Last Ran" logic has been rewritten to
+  come from the entries themselves.
+- Resolution when switching back from Classic to Expansion will not be set to
+  800x600 automatically. This is because some people might prefer to play with
+  that resolution, or maybe Blizzard will add more resolutions in the future.
+  If left like this, the switcher will keep "resetting" your resolution back
+  to 800x600.
+- Removed ability to enter custom version label in Add/Modify window.
+  It won't really be reliable since the internal code logic expects specific
+  versions. We'll just need to update the app to take into account for new
+  versions that Blizzard releases.
+- Determination of what files are for what version is now additive,
+  meaning we are building the required files list are we go.
+- Application will first backup files between runs, and then delete those
+  backed up files in order to give the next run a fresh slate. Before, since
+  the files were the same between all versions, we would just replace them.
+- 1.14d support
+- Game.exe file selector is now implemented in Add and Edit windows.
+- UI now indicates what was the last ran version/entry.
+- Fixed a bug where if you had the switcher in another location outside of the D2 folder
+  and your D2 folder path had spaces, Diablo II wouldn't launch.
+- Will warn the user at first launch about them needing to add the version of D2
+  that is currently installed in their Install directory to the list. Hopefully,
+  this increases the rate of success for first installs.
+  
 1.3.1
 --------------
 - Relicensed from MPLv2.0 to GPLv3.0
