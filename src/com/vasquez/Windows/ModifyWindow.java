@@ -18,6 +18,7 @@
 package com.vasquez.Windows;
 
 import com.vasquez.EntryWithModel;
+import com.vasquez.FileSwitcher;
 import com.vasquez.Listing;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
@@ -29,6 +30,7 @@ import java.awt.event.ItemListener;
 import java.io.File;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -45,14 +47,18 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class ModifyWindow extends JDialog {
     private EntryWithModel tableManager;
     private JTable entryTable;
+    private FileSwitcher fs;
     private JComboBox version;
     private JTextField path;
     private JTextField flags;
     private JCheckBox expansion;
+    private JCheckBox wasLastRan;
+    private boolean originalWasLastRan;
+    
     private int selectedEntry;
     private int versionIndex;
     
-    public ModifyWindow(JFrame mainWindow, EntryWithModel tableManager, JTable entryTable, int selectedEntry) {
+    public ModifyWindow(JFrame mainWindow, EntryWithModel tableManager, FileSwitcher fs, JTable entryTable, int selectedEntry) {
         super(mainWindow, "Modify Entry", Dialog.ModalityType.DOCUMENT_MODAL);
 
         // Set window properties
@@ -63,7 +69,8 @@ public class ModifyWindow extends JDialog {
         this.tableManager = tableManager;
         this.entryTable = entryTable;
         this.selectedEntry = selectedEntry;
-
+        this.fs = fs;
+		
         // Create components and listeners
         JButton find = new JButton("Set Path");
         JButton modify = new JButton("Modify");
@@ -80,7 +87,12 @@ public class ModifyWindow extends JDialog {
         path = new JTextField(tableManager.getSelectedPath(selectedEntry));
         flags = new JTextField(tableManager.getSelectedFlags(selectedEntry));
         expansion = new JCheckBox("Expansion", tableManager.isSelectedExpansion(selectedEntry));
-
+        wasLastRan = new JCheckBox("Last Ran", tableManager.wasLastRan(selectedEntry));
+        
+        // Used to decide whether or not we need to reset the
+        // last ran entry in the file switcher
+        originalWasLastRan = wasLastRan.isSelected();
+        		
         path.setEditable(false);
           
         if(expansion.isSelected()) {
@@ -109,10 +121,22 @@ public class ModifyWindow extends JDialog {
         getContentPane().add(BorderLayout.CENTER, centerPanel);
         getContentPane().add(BorderLayout.SOUTH, southPanel);
 
-        southPanel.add(expansion);
-        southPanel.add(find);
-        southPanel.add(modify);
-        southPanel.add(cancel);
+        JPanel checkBoxes = new JPanel();
+        JPanel buttons = new JPanel();
+        
+        buttons.setLayout(new GridLayout(2,3));
+        
+        buttons.add(find);
+        buttons.add(new JLabel("")); // This is just padding for the grid to have an empty element
+        buttons.add(modify);
+        buttons.add(cancel);
+        
+        checkBoxes.setLayout(new BoxLayout(checkBoxes, BoxLayout.PAGE_AXIS));
+        checkBoxes.add(expansion);
+        checkBoxes.add(wasLastRan);
+        
+        southPanel.add(checkBoxes);
+        southPanel.add(buttons);
 
         centerPanel.add(versionL);
         centerPanel.add(version);
@@ -125,7 +149,18 @@ public class ModifyWindow extends JDialog {
     private class modifyListener implements ActionListener {
         public void actionPerformed(ActionEvent ev) {
             if(!version.getSelectedItem().toString().isEmpty() && !path.getText().isEmpty()) {
-                tableManager.modifyEntry(version.getSelectedItem().toString(), path.getText(), flags.getText(), expansion.isSelected(), selectedEntry);
+                tableManager.modifyEntry(version.getSelectedItem().toString(), path.getText(),
+                		                 flags.getText(), expansion.isSelected(), wasLastRan.isSelected(), selectedEntry);
+                
+                if(originalWasLastRan != wasLastRan.isSelected()) {
+                	if(!wasLastRan.isSelected()) {
+                		fs.resetLastRanEntry();
+                	}
+                	else {
+                		fs.setLastRanEntry(tableManager.getEntry(selectedEntry));
+                	}
+                }
+                
                 entryTable.setRowSelectionInterval(selectedEntry, selectedEntry);
             }
 

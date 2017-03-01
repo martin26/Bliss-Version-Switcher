@@ -45,7 +45,7 @@ public class EntryWithModel {
 
     public Entry getLastRanEntry() {
         for(Entry e: list) {
-            if ( e.WasLastRan) {
+            if (e.WasLastRan) {
                 return e;
             } 
         }
@@ -56,8 +56,16 @@ public class EntryWithModel {
         return peModel.addEntry(version, path, flags, expansion);
     }
 
-    public int modifyEntry(String version, String path, String flags, boolean expansion, int e) {
-        peModel.modifyEntry(version, path, flags, expansion, e);
+    public int modifyEntry(String version, String path, String flags, boolean expansion, boolean wasLastRan, int e) {
+    	// Check to make sure that there is only one last ran selected.
+    	// An easy way to do this is just to set everything to false
+    	// and only enable the one we want.
+        if (wasLastRan) {
+        	for(Entry entry: list) {
+        		entry.WasLastRan = false;
+        	}
+        }  
+        peModel.modifyEntry(version, path, flags, expansion, wasLastRan, e);
         return e;
     }
 
@@ -91,6 +99,10 @@ public class EntryWithModel {
 
     public boolean isSelectedExpansion(int row) {
         return peModel.isSelectedExpansion(row);
+    }
+    
+    public boolean wasLastRan(int row) {
+    	return peModel.wasLastRan(row);
     }
 
     public int getSize() {
@@ -200,6 +212,10 @@ public class EntryWithModel {
         public boolean isSelectedExpansion(int row) {
             return list.get(row).IsExpansion;
         }
+        
+        public boolean wasLastRan(int row) {
+        	return list.get(row).WasLastRan;
+        }
 
         public int addEntry(String version, String path, String flags, boolean expansion) {
              list.add(new Entry(version, path, flags, expansion, false));
@@ -210,13 +226,14 @@ public class EntryWithModel {
              return list.size()-1;
         }
 
-        public int modifyEntry(String version, String path, String flags, boolean expansion, int e) {
+        public int modifyEntry(String version, String path, String flags, boolean expansion, boolean wasLastRan, int e) {
             Entry t = list.get(e);
 
             t.Version = version;
             t.IsExpansion = expansion;
             t.Path = path;
             t.Flags = flags;
+            t.WasLastRan = wasLastRan;
 
             saveData();
             fireTableDataChanged();

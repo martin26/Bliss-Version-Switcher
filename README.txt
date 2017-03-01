@@ -1,7 +1,7 @@
-Name   : Bliss Version Switcher 1.4.0
+Name   : Bliss Version Switcher 1.4.1
 Author : Jonathan Vasquez (fearedbliss) <jon@xyinn.org>
 License: GNU General Public License 3.0
-Date   : Saturday, February 25, 2017
+Date   : February 28, 2017
 ------------------------------------------------
 
 Description:
@@ -62,6 +62,15 @@ If you want to add any other versions, you can just click "Copy" to make a clone
 and quickly switch the "Version", "Flags" and "Expansion" options. The "Path" can stay the same.
 
 You can also click "Add" and do it from scratch as well, but using the "Copy" option is just a way to save time.
+
+Blizzard released a new patch but it isn't in the Bliss Complete Collection
+----------------
+Simply run the LOD updater either from the Standalone updater or from Battle.net,
+close D2 (if using the latter), select the entry that was last ran and uncheck the "Last Ran"
+checkbox, then add a new entry with the new version.
+
+Running BVS after this should work flawlessly and it should automatically backup the new version
+files as well.
 
 "Oh My... I broke it"
 ----------------

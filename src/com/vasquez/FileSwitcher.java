@@ -110,6 +110,14 @@ public class FileSwitcher {
         game = new File(_selectedEntry.Path);
         root = new File(game.getParent());
     }
+    
+    public void resetLastRanEntry() {
+    	_lastRanEntry = null;
+    }
+    
+    public void setLastRanEntry(Entry entry) {
+    	_lastRanEntry = entry;
+    }
 
     // Launches the game for the appropriate scenario
     // 1. First time running the application
@@ -118,13 +126,14 @@ public class FileSwitcher {
     public void launch() {
         Logger.LogInfo("Launching Diablo II: " + getGameType() + " " + _selectedEntry.Version);
 
-        // This will only happen the first time the user runs the application
-        if(_lastRanEntry == null) {            
+        // This will only happen the first time the user launches Diablo II
+        // from within the switcher.
+        if(_lastRanEntry == null) {        	
             // Set version to the current version the user has
             markSelectedEntryAsLastRan();
 
             // Backs up the files since this is the first time you are running this application
-            backupFiles();
+            backupFiles(true);
 
             // Updates the registry and makes sure that you have a save directory set up (Fresh environment)
             prepareRegistry();
@@ -157,8 +166,8 @@ public class FileSwitcher {
                 // Delete the 'data' directory of the previous version if it exists in the Diablo II root
                 deleteDataDir(0);
 
-                // Backs up the files if you don't already have a backup for this new version
-                backupFiles();
+                // Backs up the files if you don't already have a backup for the last ran version
+                backupFiles(false);
 
                 // Copy the files for the target version now
                 restoreFiles();
@@ -211,8 +220,8 @@ public class FileSwitcher {
     }
 
     // Backup the files that are in this current directory
-    private void backupFiles() {
-        Logger.LogInfo("Backing up files for last ran entry: " + _lastRanEntry.Version + " ...");
+    private void backupFiles(boolean firstRun) {
+        Logger.LogInfo("Backing up files for " + _lastRanEntry.Version + " ...");
 
         // Makes sure that the backup directories exist
         prepareBackupDir();
@@ -222,11 +231,11 @@ public class FileSwitcher {
             File targetFile = null;
 
             // Sets the path depending if it's an expansion or classic entry
-            if(_selectedEntry.IsExpansion) {
-                targetFile = new File(root.getAbsolutePath() + "\\Expansion\\" + _selectedEntry.Version + "\\" + file);
+            if(_lastRanEntry.IsExpansion) {
+                targetFile = new File(root.getAbsolutePath() + "\\Expansion\\" + _lastRanEntry.Version + "\\" + file);
             }
             else {
-                targetFile = new File(root.getAbsolutePath() + "\\Classic\\" + _selectedEntry.Version + "\\" + file);
+                targetFile = new File(root.getAbsolutePath() + "\\Classic\\" + _lastRanEntry.Version + "\\" + file);
             }
 
             // Backup the files if they aren't already backed up
@@ -235,8 +244,11 @@ public class FileSwitcher {
             }
             
             // Delete the files for these backed up ones so that the next
-            // version has a clean slate.
-            sourceFile.delete();
+            // version has a clean slate. Don't delete if it's the first run,
+            // since then we won't be able to run anything!
+            if (!firstRun) {
+            	sourceFile.delete();
+            }
         }
 
         // Backs up the data folder if it exists
@@ -270,7 +282,7 @@ public class FileSwitcher {
     
     // Restore the files for the version you want to play
     private void restoreFiles() {
-        Logger.LogInfo("Restoring important files for new run: " + _selectedEntry.Version + " ...");
+        Logger.LogInfo("Restoring important files for " + _selectedEntry.Version + " ...");
 
         for(String file: getRequiredFiles(_selectedEntry)) {
             File sourceFile = null;
@@ -351,7 +363,7 @@ public class FileSwitcher {
     // Backs up or restores the 'data' directory depending on the option
     // Options:
     //      0 = Backup
-    //      Other = Restore
+    //  Other = Restore
     private void doDataDir(int choice) {
         File sourceFile = null;
         File targetFile = null;

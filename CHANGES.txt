@@ -1,3 +1,15 @@
+1.4.1
+--------------
+- Fixed a bug where the files were being backed up to the wrong location.
+
+- Implemented new feature that allows you to clear the last run flag,
+  in order for you to be able to backup the files of a new patch,
+  and run that patch immediately without much effort.
+  
+  If a new patch comes out, just update to the new patch, clear the
+  last run flag from your current entry in BVS by editing that entry,
+  and run the new entry.
+
 1.4.0
 --------------
 - Removed my custom serialization and now using Google's JSON library.

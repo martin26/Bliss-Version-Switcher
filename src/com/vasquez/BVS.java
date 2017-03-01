@@ -51,8 +51,8 @@ public class BVS {
 
     // Program Information
     private final String name = "Bliss Version Switcher";
-    private final String version = "1.4.0";
-    private final String releaseDate = "February 25, 2017";
+    private final String version = "1.4.1";
+    private final String releaseDate = "February 28, 2017";
     private final String author = "Jonathan Vasquez";
     private final String contact = "jon@xyinn.org";
     private final String license = "GPL v3.0";
@@ -214,7 +214,7 @@ public class BVS {
 
     public void showModifyWindow() {
         if(entryTable.getSelectedRow() != -1) {
-            JDialog modifyWindow = new ModifyWindow(mainFrame, tableManager, entryTable, entryTable.getSelectedRow());
+            JDialog modifyWindow = new ModifyWindow(mainFrame, tableManager, fs, entryTable, entryTable.getSelectedRow());
 
             modifyWindow.setLocation(mainFrame.getLocation());
             modifyWindow.setSize(400,175);
