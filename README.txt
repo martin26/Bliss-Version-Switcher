@@ -1,14 +1,14 @@
-Name   : Bliss Version Switcher 1.4.1
+Name   : Bliss Version Switcher 1.4.2
 Author : Jonathan Vasquez (fearedbliss) <jon@xyinn.org>
 License: GNU General Public License 3.0
-Date   : February 28, 2017
+Date   : March 1, 2017
 ------------------------------------------------
 
 Description:
 ---------------
 This is a simple Java based application that will help you manage/launch multiple versions of Diablo II from a single window.
 
-This means you can easily install and play every single version of Diablo II from 1.00 to the latest 1.13d (and any other future versions)
+This means you can easily install and play every single version of Diablo II from 1.00 to the latest 1.14d (and any other future versions)
 while maximizing your disk space (Since you won't have to keep having multiple copies of your MPQs), and having complete character isolation.
 
 Requirements:
@@ -55,6 +55,11 @@ Path A) If you are using any custom .dlls (Like d2gfx.dll), you can place this d
 
 Path B) If you already switched into that version, you can drop the dll into the Diablo II folder and also the respective version folder (or switch to a different
 version and switch back into the version you want after you followed Path A.
+
+"data" folder
+---------------
+BVS can run from any location on disk. However, the "-direct -txt" command seems to require that the data folder be in the Diablo II directory.
+For this reason, if you are planning on using a data folder, place BVS inside the Diablo II directory as well.
 
 Adding versions afterwards:
 ---------------

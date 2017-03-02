@@ -24,4 +24,4 @@ if '%errorlevel%' NEQ '0' (
     CD /D "%~dp0"
 :--------------------------------------
 
-start javaw -jar BlissVersionSwitcher.jar
+start javaw -jar Bliss_Version_Switcher.jar

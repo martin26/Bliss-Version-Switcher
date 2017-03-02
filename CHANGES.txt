@@ -1,3 +1,9 @@
+1.4.2
+--------------
+- Switched the "Edit" button back to "Modify" to have consistency between the forms.
+- Added some more info in the README.
+- Changed the UAC launcher to launch Bliss_Version_Switcher.jar (With underscores)
+
 1.4.1
 --------------
 - Fixed a bug where the files were being backed up to the wrong location.

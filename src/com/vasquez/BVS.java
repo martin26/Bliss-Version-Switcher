@@ -51,8 +51,8 @@ public class BVS {
 
     // Program Information
     private final String name = "Bliss Version Switcher";
-    private final String version = "1.4.1";
-    private final String releaseDate = "February 28, 2017";
+    private final String version = "1.4.2";
+    private final String releaseDate = "March 1, 2017";
     private final String author = "Jonathan Vasquez";
     private final String contact = "jon@xyinn.org";
     private final String license = "GPL v3.0";
@@ -79,7 +79,7 @@ public class BVS {
         // Buttons on South
         JButton add = new JButton("Add");
         JButton delete = new JButton("Delete");
-        JButton modify = new JButton("Edit");
+        JButton modify = new JButton("Modify");
         JButton launch = new JButton("Launch");
         JButton about = new JButton("About");
         JButton copy = new JButton("Copy");
