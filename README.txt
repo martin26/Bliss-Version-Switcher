@@ -1,7 +1,7 @@
-Name   : Bliss Version Switcher 1.4.2
+Name   : Bliss Version Switcher 1.4.3
 Author : Jonathan Vasquez (fearedbliss) <jon@xyinn.org>
-License: GNU General Public License 3.0
-Date   : March 1, 2017
+License: 2-BSD
+Date   : March 4, 2017
 ------------------------------------------------
 
 Description:
